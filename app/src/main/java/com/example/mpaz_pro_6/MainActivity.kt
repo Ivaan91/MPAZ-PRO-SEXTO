@@ -4,44 +4,41 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.mpaz_pro_6.data.AppDatabase
+import com.example.mpaz_pro_6.ui.screens.*
 import com.example.mpaz_pro_6.ui.theme.MPAZPRO6Theme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val db = AppDatabase.getDatabase(this)
+        val usuarioDao = db.usuarioDao()
+
         enableEdgeToEdge()
         setContent {
             MPAZPRO6Theme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                AppNavigation(usuarioDao)
             }
         }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun AppNavigation(usuarioDao: com.example.mpaz_pro_6.data.UsuarioDao) {
+    val navController = rememberNavController()
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MPAZPRO6Theme {
-        Greeting("Android")
+    NavHost(navController = navController, startDestination = "login") {
+        composable("login") { PantallaLogin(navController, usuarioDao) }
+        composable("home_estudiante") { PantallaHomeEstudiante(navController) }
+        composable("detalle_unidad") { PantallaDetalleUnidad(navController) }
+        composable("quiz") { PantallaQuiz(navController) }
+        composable("resultado_prueba") { PantallaResultadoPrueba(navController) }
+        composable("home_docente") { PantallaHomeDocente(navController) }
+        composable("informe_pedagogico") { PantallaInformePedagogico(navController) }
+        composable("home_utp") { PantallaHomeUTP(navController) }
     }
 }
