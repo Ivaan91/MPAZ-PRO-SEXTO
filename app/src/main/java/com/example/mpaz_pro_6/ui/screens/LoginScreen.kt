@@ -1,14 +1,17 @@
 package com.example.mpaz_pro_6.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -26,9 +30,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun PantallaLogin(navController: NavHostController, usuarioDao: UsuarioDao) {
     var usuarios by remember { mutableStateOf<List<UsuarioEntity>>(emptyList()) }
-    var usuarioSeleccionado by remember { mutableStateOf<UsuarioEntity?>(null) }
     var usuarioTexto by remember { mutableStateOf("") }
     var claveTexto by remember { mutableStateOf("") }
+    var claveVisible by remember { mutableStateOf(false) }
+    var mostrarCuentas by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
 
@@ -45,8 +50,6 @@ fun PantallaLogin(navController: NavHostController, usuarioDao: UsuarioDao) {
             lista = usuarioDao.obtenerTodosLosUsuarios()
         }
         usuarios = lista
-        usuarioSeleccionado = lista.firstOrNull { it.rol == "Estudiante" }
-        usuarioTexto = usuarioSeleccionado?.usuario ?: ""
     }
 
     Column(
@@ -71,52 +74,11 @@ fun PantallaLogin(navController: NavHostController, usuarioDao: UsuarioDao) {
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-            Text("¿Quién va a ingresar?", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-            Text("Elige un perfil ficticio e ingresa su clave.", fontSize = 13.sp, color = Color.Gray)
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            usuarios.forEach { user ->
-                val isSelected = user == usuarioSeleccionado
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp)
-                        .clickable {
-                            usuarioSeleccionado = user
-                            usuarioTexto = user.usuario
-                            claveTexto = ""
-                            error = null
-                        }
-                        .border(2.dp, if (isSelected) Color(0xFF2563EB) else Color.LightGray, RoundedCornerShape(16.dp)),
-                    colors = CardDefaults.cardColors(containerColor = if (isSelected) Color(0xFFEFF6FF) else Color.White)
-                ) {
-                    Row(modifier = Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier.size(44.dp).background(Color.White, RoundedCornerShape(22.dp)).border(1.dp, Color.LightGray, RoundedCornerShape(22.dp)),
-                            contentAlignment = Alignment.Center
-                        ) { Text(user.iniciales, color = Color(0xFF1E3A8A), fontWeight = FontWeight.Bold) }
-                        Spacer(modifier = Modifier.width(14.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(user.nombre, fontWeight = FontWeight.Bold, color = Color.Black)
-                            Text(user.descripcion, fontSize = 12.sp, color = Color.Gray)
-                        }
-                        RadioButton(
-                            selected = isSelected,
-                            onClick = {
-                                usuarioSeleccionado = user
-                                usuarioTexto = user.usuario
-                                claveTexto = ""
-                                error = null
-                            },
-                            colors = RadioButtonDefaults.colors(selectedColor = Color(0xFF2563EB))
-                        )
-                    }
-                }
-            }
+            Text("Iniciar sesión", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Text("Ingresa tu usuario y tu clave.", fontSize = 13.sp, color = Color.Gray)
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -133,7 +95,15 @@ fun PantallaLogin(navController: NavHostController, usuarioDao: UsuarioDao) {
                 onValueChange = { claveTexto = it; error = null },
                 label = { Text("Clave") },
                 singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
+                visualTransformation = if (claveVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(onClick = { claveVisible = !claveVisible }) {
+                        Icon(
+                            imageVector = if (claveVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            contentDescription = if (claveVisible) "Ocultar clave" else "Mostrar clave"
+                        )
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -163,6 +133,51 @@ fun PantallaLogin(navController: NavHostController, usuarioDao: UsuarioDao) {
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text("Ingresar")
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Cuentas ficticias de demostración: ocultas hasta que se tocan.
+            TextButton(onClick = { mostrarCuentas = !mostrarCuentas }) {
+                Text("Cuentas de demostración", color = Color(0xFF2563EB))
+                Icon(
+                    imageVector = if (mostrarCuentas) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = null,
+                    tint = Color(0xFF2563EB)
+                )
+            }
+
+            if (mostrarCuentas) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                        Text(
+                            "Toca una cuenta para completar los campos.",
+                            fontSize = 12.sp,
+                            color = Color.Gray,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                        )
+                        usuarios.forEach { user ->
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        usuarioTexto = user.usuario
+                                        claveTexto = user.clave
+                                        claveVisible = false
+                                        error = null
+                                    }
+                                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                            ) {
+                                Text("${user.rol} · ${user.nombre}", fontWeight = FontWeight.Bold, color = Color.Black, fontSize = 14.sp)
+                                Text("${user.usuario} / ${user.clave}", fontSize = 12.sp, color = Color.Gray)
+                            }
+                        }
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
