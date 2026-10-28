@@ -57,7 +57,7 @@ fun PantallaHomeEstudiante(navController: NavHostController) {
 
         MockRepository.asignaturas.forEach { item ->
             Card(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp).clickable { navController.navigate("detalle_unidad") },
+                modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp).clickable { navController.navigate("detalle_unidad/${item.id}") },
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 shape = RoundedCornerShape(12.dp)
             ) {

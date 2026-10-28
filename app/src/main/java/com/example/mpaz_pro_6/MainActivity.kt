@@ -11,6 +11,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.mpaz_pro_6.data.AppDatabase
 import com.example.mpaz_pro_6.ui.screens.*
 import com.example.mpaz_pro_6.ui.theme.MPAZPRO6Theme
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,8 +36,18 @@ fun AppNavigation(usuarioDao: com.example.mpaz_pro_6.data.UsuarioDao) {
     NavHost(navController = navController, startDestination = "login") {
         composable("login") { PantallaLogin(navController, usuarioDao) }
         composable("home_estudiante") { PantallaHomeEstudiante(navController) }
-        composable("detalle_unidad") { PantallaDetalleUnidad(navController) }
-        composable("quiz") { PantallaQuiz(navController) }
+        composable(
+            route = "detalle_unidad/{asignaturaId}",
+            arguments = listOf(navArgument("asignaturaId") { type = NavType.StringType })
+        ) { entrada ->
+            PantallaDetalleUnidad(navController, entrada.arguments?.getString("asignaturaId") ?: "3")
+        }
+        composable(
+            route = "quiz/{asignaturaId}",
+            arguments = listOf(navArgument("asignaturaId") { type = NavType.StringType })
+        ) { entrada ->
+            PantallaQuiz(navController, entrada.arguments?.getString("asignaturaId") ?: "3")
+        }
         composable("resultado_prueba") { PantallaResultadoPrueba(navController) }
         composable("home_docente") { PantallaHomeDocente(navController) }
         composable("informe_pedagogico") { PantallaInformePedagogico(navController) }
