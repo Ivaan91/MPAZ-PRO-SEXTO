@@ -39,9 +39,9 @@ import androidx.navigation.NavHostController
 import com.example.mpaz_pro_6.model.MockRepository
 
 @Composable
-fun PantallaQuiz(navController: NavHostController) {
-    var opcionSeleccionada by remember { mutableIntStateOf(1) }
-    val pregunta = MockRepository.preguntasCiencias[0]
+fun PantallaQuiz(navController: NavHostController, asignaturaId: String) {
+    var opcionSeleccionada by remember { mutableIntStateOf(-1) }
+    val pregunta = MockRepository.preguntasDe(asignaturaId).first()
 
     Column(modifier = Modifier.fillMaxSize().background(Color(0xFFF8F9FA)).padding(20.dp)) {
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -77,6 +77,7 @@ fun PantallaQuiz(navController: NavHostController) {
 
         Button(
             onClick = { navController.navigate("resultado_prueba") },
+            enabled = opcionSeleccionada >= 0,
             modifier = Modifier.fillMaxWidth().height(50.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB)),
             shape = RoundedCornerShape(12.dp)
