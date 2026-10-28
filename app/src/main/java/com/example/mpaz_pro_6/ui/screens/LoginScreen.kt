@@ -7,6 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MenuBook
@@ -29,26 +30,23 @@ import com.example.mpaz_pro_6.data.UsuarioEntity
 import com.example.mpaz_pro_6.viewmodel.LoginViewModel
 import com.example.mpaz_pro_6.viewmodel.LoginViewModelFactory
 
+
 @Composable
 fun PantallaLogin(
     navController: NavHostController,
     usuarioDao: UsuarioDao
 ) {
 
-    // Creamos el ViewModel y le entregamos el DAO.
     val loginViewModel: LoginViewModel = viewModel(
         factory = LoginViewModelFactory(usuarioDao)
     )
 
-    // La pantalla observa el estado manejado por el ViewModel.
     val uiState by loginViewModel.uiState.collectAsState()
 
-    // Esta lista sigue siendo local por ahora.
     var usuarios by remember {
         mutableStateOf<List<UsuarioEntity>>(emptyList())
     }
 
-    // Estas variables son solamente de comportamiento visual.
     var claveVisible by remember {
         mutableStateOf(false)
     }
@@ -57,7 +55,7 @@ fun PantallaLogin(
         mutableStateOf(false)
     }
 
-    // Cargamos los usuarios ficticios desde Room.
+
     LaunchedEffect(Unit) {
 
         var lista = usuarioDao.obtenerTodosLosUsuarios()
@@ -101,6 +99,7 @@ fun PantallaLogin(
         usuarios = lista
     }
 
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -109,13 +108,14 @@ fun PantallaLogin(
             .verticalScroll(rememberScrollState())
     ) {
 
+        // Encabezado azul.
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(210.dp)
                 .background(
-                    Color(0xFF1E3A8A),
-                    RoundedCornerShape(
+                    color = Color(0xFF1E3A8A),
+                    shape = RoundedCornerShape(
                         bottomStart = 24.dp,
                         bottomEnd = 24.dp
                     )
@@ -153,9 +153,11 @@ fun PantallaLogin(
             }
         }
 
+
         Spacer(
             modifier = Modifier.height(24.dp)
         )
+
 
         Column(
             modifier = Modifier.padding(horizontal = 24.dp)
@@ -174,12 +176,13 @@ fun PantallaLogin(
                 color = Color.Gray
             )
 
+
             Spacer(
                 modifier = Modifier.height(16.dp)
             )
 
-            // CAMBIO:
-            // Ahora el valor viene desde uiState.
+
+            // CAMPO USUARIO
             OutlinedTextField(
                 value = uiState.usuario,
 
@@ -193,15 +196,43 @@ fun PantallaLogin(
 
                 singleLine = true,
 
+                // Si existe un error de usuario,
+                // Material 3 muestra el campo en estado de error.
+                isError = uiState.errorUsuario != null,
+
+                trailingIcon = {
+
+                    if (uiState.errorUsuario != null) {
+
+                        Icon(
+                            imageVector = Icons.Default.Error,
+                            contentDescription = "Error en usuario",
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
+                },
+
+                supportingText = {
+
+                    uiState.errorUsuario?.let { mensaje ->
+
+                        Text(
+                            text = mensaje,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                },
+
                 modifier = Modifier.fillMaxWidth()
             )
+
 
             Spacer(
                 modifier = Modifier.height(8.dp)
             )
 
-            // CAMBIO:
-            // La clave también pertenece al ViewModel.
+
+            // CAMPO CLAVE
             OutlinedTextField(
                 value = uiState.clave,
 
@@ -215,35 +246,74 @@ fun PantallaLogin(
 
                 singleLine = true,
 
+                isError = uiState.errorClave != null,
+
                 visualTransformation =
                     if (claveVisible) {
+
                         VisualTransformation.None
+
                     } else {
+
                         PasswordVisualTransformation()
                     },
 
                 trailingIcon = {
 
-                    IconButton(
-                        onClick = {
-                            claveVisible = !claveVisible
-                        }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                        Icon(
-                            imageVector =
-                                if (claveVisible) {
-                                    Icons.Default.VisibilityOff
-                                } else {
-                                    Icons.Default.Visibility
-                                },
+                        // Ícono de error.
+                        if (uiState.errorClave != null) {
 
-                            contentDescription =
-                                if (claveVisible) {
-                                    "Ocultar clave"
-                                } else {
-                                    "Mostrar clave"
-                                }
+                            Icon(
+                                imageVector = Icons.Default.Error,
+                                contentDescription = "Error en clave",
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
+
+
+                        // Mostrar / ocultar contraseña.
+                        IconButton(
+                            onClick = {
+                                claveVisible = !claveVisible
+                            }
+                        ) {
+
+                            Icon(
+                                imageVector =
+                                    if (claveVisible) {
+
+                                        Icons.Default.VisibilityOff
+
+                                    } else {
+
+                                        Icons.Default.Visibility
+                                    },
+
+                                contentDescription =
+                                    if (claveVisible) {
+
+                                        "Ocultar clave"
+
+                                    } else {
+
+                                        "Mostrar clave"
+                                    }
+                            )
+                        }
+                    }
+                },
+
+                supportingText = {
+
+                    uiState.errorClave?.let { mensaje ->
+
+                        Text(
+                            text = mensaje,
+                            color = MaterialTheme.colorScheme.error
                         )
                     }
                 },
@@ -251,10 +321,11 @@ fun PantallaLogin(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // CAMBIO:
-            // El error ya no pertenece a LoginScreen.
-            // Lo entrega el LoginViewModel.
-            uiState.error?.let { mensaje ->
+
+            // ERROR GENERAL:
+            // usuario y contraseña escritos,
+            // pero las credenciales no son correctas.
+            uiState.errorGeneral?.let { mensaje ->
 
                 Spacer(
                     modifier = Modifier.height(8.dp)
@@ -262,46 +333,49 @@ fun PantallaLogin(
 
                 Text(
                     text = mensaje,
-                    color = Color(0xFFDC2626),
+                    color = MaterialTheme.colorScheme.error,
                     fontSize = 13.sp
                 )
             }
+
 
             Spacer(
                 modifier = Modifier.height(20.dp)
             )
 
+
+            // BOTÓN INGRESAR
             Button(
                 onClick = {
 
-                    // CAMBIO:
-                    // LoginScreen ya NO consulta directamente Room.
                     loginViewModel.iniciarSesion { rol ->
 
                         when (rol) {
 
-                            "Estudiante" ->
+                            "Estudiante" -> {
                                 navController.navigate(
                                     "home_estudiante"
                                 )
+                            }
 
-                            "Docente" ->
+                            "Docente" -> {
                                 navController.navigate(
                                     "home_docente"
                                 )
+                            }
 
-                            "UTP" ->
+                            "UTP" -> {
                                 navController.navigate(
                                     "home_utp"
                                 )
+                            }
                         }
                     }
                 },
 
-                enabled =
-                    uiState.usuario.isNotBlank() &&
-                            uiState.clave.isNotBlank() &&
-                            !uiState.cargando,
+                // Lo dejamos habilitado aunque los campos
+                // estén vacíos para poder mostrar los errores.
+                enabled = !uiState.cargando,
 
                 modifier = Modifier
                     .fillMaxWidth()
@@ -314,8 +388,6 @@ fun PantallaLogin(
                 shape = RoundedCornerShape(12.dp)
             ) {
 
-                // Si está consultando Room,
-                // mostramos un indicador de carga.
                 if (uiState.cargando) {
 
                     CircularProgressIndicator(
@@ -330,12 +402,13 @@ fun PantallaLogin(
                 }
             }
 
+
             Spacer(
                 modifier = Modifier.height(12.dp)
             )
 
-            // Esto es solamente visual,
-            // por eso permanece dentro del Composable.
+
+            // BOTÓN CUENTAS DE DEMOSTRACIÓN
             TextButton(
                 onClick = {
                     mostrarCuentas = !mostrarCuentas
@@ -350,8 +423,11 @@ fun PantallaLogin(
                 Icon(
                     imageVector =
                         if (mostrarCuentas) {
+
                             Icons.Default.KeyboardArrowUp
+
                         } else {
+
                             Icons.Default.KeyboardArrowDown
                         },
 
@@ -360,6 +436,8 @@ fun PantallaLogin(
                 )
             }
 
+
+            // LISTA DE CUENTAS
             if (mostrarCuentas) {
 
                 Card(
@@ -388,6 +466,7 @@ fun PantallaLogin(
                             )
                         )
 
+
                         usuarios.forEach { user ->
 
                             Column(
@@ -395,8 +474,8 @@ fun PantallaLogin(
                                     .fillMaxWidth()
                                     .clickable {
 
-                                        // CAMBIO:
-                                        // Ya no usamos usuarioTexto ni claveTexto.
+                                        // Los valores ahora se modifican
+                                        // mediante el ViewModel.
                                         loginViewModel.cambiarUsuario(
                                             user.usuario
                                         )
@@ -431,9 +510,11 @@ fun PantallaLogin(
                 }
             }
 
+
             Spacer(
                 modifier = Modifier.height(8.dp)
             )
+
 
             Text(
                 text = "Demostración con datos ficticios · Sin permisos del dispositivo",
@@ -441,6 +522,7 @@ fun PantallaLogin(
                 color = Color.Gray,
                 modifier = Modifier.fillMaxWidth()
             )
+
 
             Spacer(
                 modifier = Modifier.height(24.dp)

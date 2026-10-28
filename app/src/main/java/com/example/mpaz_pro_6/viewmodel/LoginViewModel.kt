@@ -13,7 +13,11 @@ import kotlinx.coroutines.launch
 data class LoginUiState(
     val usuario: String = "",
     val clave: String = "",
-    val error: String? = null,
+
+    val errorUsuario: String? = null,
+    val errorClave: String? = null,
+    val errorGeneral: String? = null,
+
     val cargando: Boolean = false
 )
 
@@ -33,16 +37,17 @@ class LoginViewModel(
 
         _uiState.value = _uiState.value.copy(
             usuario = nuevoUsuario,
-            error = null
+            errorUsuario = null,
+            errorGeneral = null
         )
     }
-
 
     fun cambiarClave(nuevaClave: String) {
 
         _uiState.value = _uiState.value.copy(
             clave = nuevaClave,
-            error = null
+            errorClave = null,
+            errorGeneral = null
         )
     }
 
@@ -51,25 +56,28 @@ class LoginViewModel(
 
         val estado = _uiState.value
 
-        if (estado.usuario.isBlank()) {
+        val errorUsuario =
+            if (estado.usuario.isBlank()) {
+                "Debes ingresar un usuario."
+            } else {
+                null
+            }
 
-            _uiState.value = estado.copy(
-                error = "Debes ingresar un usuario."
-            )
+        val errorClave =
+            if (estado.clave.isBlank()) {
+                "Debes ingresar una clave."
+            } else {
+                null
+            }
 
-            return false
-        }
+        _uiState.value = estado.copy(
+            errorUsuario = errorUsuario,
+            errorClave = errorClave,
+            errorGeneral = null
+        )
 
-        if (estado.clave.isBlank()) {
-
-            _uiState.value = estado.copy(
-                error = "Debes ingresar una clave."
-            )
-
-            return false
-        }
-
-        return true
+        return errorUsuario == null &&
+                errorClave == null
     }
 
 
@@ -86,9 +94,8 @@ class LoginViewModel(
             _uiState.value =
                 _uiState.value.copy(
                     cargando = true,
-                    error = null
+                    errorGeneral = null
                 )
-
             val estado = _uiState.value
 
             val usuarioEncontrado =
@@ -102,7 +109,7 @@ class LoginViewModel(
                 _uiState.value =
                     _uiState.value.copy(
                         cargando = false,
-                        error = "Usuario o clave incorrectos."
+                        errorGeneral = "Usuario o clave incorrectos."
                     )
 
                 return@launch
@@ -111,7 +118,7 @@ class LoginViewModel(
             _uiState.value =
                 _uiState.value.copy(
                     cargando = false,
-                    error = null
+                    errorGeneral = null
                 )
 
             onLoginCorrecto(
