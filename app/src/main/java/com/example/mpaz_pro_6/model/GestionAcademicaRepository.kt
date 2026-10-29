@@ -27,14 +27,26 @@ data class RevisionUnidad(
 )
 
 
+enum class EstadoInformePedagogico(
+    val texto: String
+) {
+
+    PENDIENTE(
+        "Pendiente de validar"
+    ),
+
+    VALIDADO(
+        "Validado"
+    )
+}
+
+
 object GestionAcademicaRepository {
 
-    /*
-     * Estado de revisión de cada asignatura.
-     *
-     * Se mantiene mientras la aplicación
-     * permanece abierta.
-     */
+    // -------------------------
+    // REVISIONES UTP
+    // -------------------------
+
     private val revisiones =
         mutableMapOf<String, RevisionUnidad>()
 
@@ -86,5 +98,34 @@ object GestionAcademicaRepository {
                 observacion =
                     observacion.trim()
             )
+    }
+
+
+    // -------------------------
+    // INFORMES PEDAGÓGICOS
+    // -------------------------
+
+    private val estadosInforme =
+        mutableMapOf<
+                String,
+                EstadoInformePedagogico
+                >()
+
+
+    fun estadoInforme(
+        asignaturaId: String
+    ): EstadoInformePedagogico {
+
+        return estadosInforme[asignaturaId]
+            ?: EstadoInformePedagogico.PENDIENTE
+    }
+
+
+    fun validarInforme(
+        asignaturaId: String
+    ) {
+
+        estadosInforme[asignaturaId] =
+            EstadoInformePedagogico.VALIDADO
     }
 }
