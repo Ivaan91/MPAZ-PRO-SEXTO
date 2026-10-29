@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,51 +27,111 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
+import com.example.mpaz_pro_6.model.GestionAcademicaRepository
 import com.example.mpaz_pro_6.model.MockRepository
 import com.example.mpaz_pro_6.model.ProgresoRepository
 import com.example.mpaz_pro_6.ui.theme.Paleta
 import com.example.mpaz_pro_6.util.NotificationHelper
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 @Composable
 fun PantallaHomeEstudiante(
-    navController: NavHostController
+    navController:
+    NavHostController
 ) {
 
     val context =
         LocalContext.current
 
 
+    val asignaturasDisponibles =
+        MockRepository
+            .asignaturas
+            .filter {
+
+                GestionAcademicaRepository
+                    .unidadDisponibleEstudiante(
+                        it.id
+                    )
+            }
+
+
     val avanceGeneral =
-        ProgresoRepository.avanceGeneral()
+
+        if (
+            asignaturasDisponibles
+                .isEmpty()
+        ) {
+
+            0f
+
+        } else {
+
+            asignaturasDisponibles
+                .map {
+
+                    ProgresoRepository
+                        .avance(
+                            it.id
+                        )
+                }
+                .average()
+                .toFloat()
+        }
 
 
-    /*
-     * Buscamos la asignatura con menor avance.
-     *
-     * Así la notificación no muestra
-     * un texto cualquiera, sino una sugerencia
-     * relacionada con el progreso real.
-     */
     val asignaturaSugerida =
-        MockRepository.asignaturas
+        asignaturasDisponibles
             .minByOrNull {
 
                 ProgresoRepository
-                    .avance(it.id)
+                    .avance(
+                        it.id
+                    )
             }
-            ?: MockRepository.asignaturas.first()
 
 
-    var mensajeNotificacion by remember {
-        mutableStateOf<String?>(null)
-    }
+    val fechaActual =
+        remember {
+
+            SimpleDateFormat(
+                "EEEE d 'de' MMMM",
+                Locale(
+                    "es",
+                    "CL"
+                )
+            )
+                .format(
+                    Date()
+                )
+                .replaceFirstChar {
+
+                    if (
+                        it.isLowerCase()
+                    ) {
+
+                        it.titlecase()
+
+                    } else {
+
+                        it.toString()
+                    }
+                }
+        }
 
 
-    /*
-     * Android 13+ pide permiso
-     * para enviar notificaciones.
-     */
+    var mensajeNotificacion
+            by remember {
+
+                mutableStateOf<String?>(
+                    null
+                )
+            }
+
+
     val permisoNotificaciones =
         rememberLauncherForActivityResult(
 
@@ -80,13 +141,22 @@ fun PantallaHomeEstudiante(
 
         ) { concedido ->
 
-            if (concedido) {
+            val sugerida =
+                asignaturaSugerida
+
+
+            if (
+                concedido &&
+                sugerida != null
+            ) {
 
                 val enviada =
                     NotificationHelper
                         .mostrarRecordatorio(
+
                             context,
-                            asignaturaSugerida.nombre
+
+                            sugerida.nombre
                         )
 
 
@@ -101,7 +171,9 @@ fun PantallaHomeEstudiante(
                         "No se pudo enviar el recordatorio."
                     }
 
-            } else {
+            } else if (
+                !concedido
+            ) {
 
                 mensajeNotificacion =
                     "No se concedió el permiso de notificaciones."
@@ -110,15 +182,20 @@ fun PantallaHomeEstudiante(
 
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Paleta.Fondo)
-            .statusBarsPadding()
-            .navigationBarsPadding()
-            .verticalScroll(
-                rememberScrollState()
-            )
-            .padding(20.dp)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(
+                    Paleta.Fondo
+                )
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .verticalScroll(
+                    rememberScrollState()
+                )
+                .padding(
+                    20.dp
+                )
     ) {
 
         // -------------------------
@@ -126,91 +203,95 @@ fun PantallaHomeEstudiante(
         // -------------------------
 
         Row(
-            verticalAlignment =
-                Alignment.CenterVertically,
-
             modifier =
                 Modifier.fillMaxWidth(),
 
-            horizontalArrangement =
-                Arrangement.SpaceBetween
+            verticalAlignment =
+                Alignment.CenterVertically
         ) {
 
-            Row(
-                verticalAlignment =
-                    Alignment.CenterVertically
-            ) {
-
-                Box(
-                    modifier = Modifier
+            Box(
+                modifier =
+                    Modifier
                         .size(44.dp)
                         .background(
                             Color.White,
-                            RoundedCornerShape(22.dp)
+                            RoundedCornerShape(
+                                22.dp
+                            )
                         )
                         .border(
                             1.dp,
                             Color.LightGray,
-                            RoundedCornerShape(22.dp)
+                            RoundedCornerShape(
+                                22.dp
+                            )
                         ),
 
-                    contentAlignment =
-                        Alignment.Center
-                ) {
+                contentAlignment =
+                    Alignment.Center
+            ) {
 
-                    Text(
-                        text = "SC",
-                        color =
-                            Paleta.AzulOscuro,
-                        fontWeight =
-                            FontWeight.Bold
-                    )
-                }
+                Text(
+                    text =
+                        "SC",
+
+                    color =
+                        Paleta.AzulOscuro,
+
+                    fontWeight =
+                        FontWeight.Bold
+                )
+            }
 
 
-                Spacer(
-                    modifier =
-                        Modifier.width(12.dp)
+            Spacer(
+                Modifier.width(
+                    12.dp
+                )
+            )
+
+
+            Column {
+
+                Text(
+                    text =
+                        fechaActual,
+
+                    fontSize =
+                        11.sp,
+
+                    color =
+                        Paleta.TextoSuave
                 )
 
 
-                Column {
+                Text(
+                    text =
+                        "¡Hola, Sofía!",
 
-                    Text(
-                        text =
-                            "Lunes 5 de octubre",
+                    fontSize =
+                        22.sp,
 
-                        fontSize = 11.sp,
+                    fontWeight =
+                        FontWeight.Bold,
 
-                        color =
-                            Paleta.TextoSuave
-                    )
-
-
-                    Text(
-                        text =
-                            "¡Hola, Sofía!",
-
-                        fontSize = 22.sp,
-
-                        fontWeight =
-                            FontWeight.Bold,
-
-                        color =
-                            Paleta.Texto
-                    )
-                }
+                    color =
+                        Paleta.Texto
+                )
             }
         }
 
 
         Spacer(
-            modifier = Modifier.height(20.dp)
+            Modifier.height(
+                20.dp
+            )
         )
 
 
         // -------------------------
-        // AVANCE GENERAL
+        // PROGRESO
         // -------------------------
 
         Card(
@@ -218,18 +299,23 @@ fun PantallaHomeEstudiante(
                 Modifier.fillMaxWidth(),
 
             colors =
-                CardDefaults.cardColors(
-                    containerColor =
-                        Paleta.AzulOscuro
-                ),
+                CardDefaults
+                    .cardColors(
+                        containerColor =
+                            Paleta.AzulOscuro
+                    ),
 
             shape =
-                RoundedCornerShape(16.dp)
+                RoundedCornerShape(
+                    16.dp
+                )
         ) {
 
             Column(
                 modifier =
-                    Modifier.padding(18.dp)
+                    Modifier.padding(
+                        18.dp
+                    )
             ) {
 
                 Text(
@@ -239,7 +325,8 @@ fun PantallaHomeEstudiante(
                     color =
                         Color.White,
 
-                    fontSize = 13.sp
+                    fontSize =
+                        13.sp
                 )
 
 
@@ -250,7 +337,8 @@ fun PantallaHomeEstudiante(
                     color =
                         Color.White,
 
-                    fontSize = 34.sp,
+                    fontSize =
+                        34.sp,
 
                     fontWeight =
                         FontWeight.Bold
@@ -258,8 +346,9 @@ fun PantallaHomeEstudiante(
 
 
                 Spacer(
-                    modifier =
-                        Modifier.height(6.dp)
+                    Modifier.height(
+                        6.dp
+                    )
                 )
 
 
@@ -282,18 +371,28 @@ fun PantallaHomeEstudiante(
 
 
                 Spacer(
-                    modifier =
-                        Modifier.height(10.dp)
+                    Modifier.height(
+                        10.dp
+                    )
                 )
 
 
                 Text(
                     text =
+
                         if (
-                            avanceGeneral == 0f
+                            asignaturasDisponibles
+                                .isEmpty()
                         ) {
 
-                            "Empieza por la asignatura que prefieras."
+                            "Aún no tienes unidades autorizadas por UTP."
+
+                        } else if (
+                            avanceGeneral ==
+                            0f
+                        ) {
+
+                            "Ya tienes contenido disponible para comenzar."
 
                         } else {
 
@@ -303,19 +402,22 @@ fun PantallaHomeEstudiante(
                     color =
                         Color.White,
 
-                    fontSize = 12.sp
+                    fontSize =
+                        12.sp
                 )
             }
         }
 
 
         Spacer(
-            modifier = Modifier.height(16.dp)
+            Modifier.height(
+                16.dp
+            )
         )
 
 
         // -------------------------
-        // RECORDATORIO NATIVO
+        // NOTIFICACIÓN
         // -------------------------
 
         Card(
@@ -323,18 +425,23 @@ fun PantallaHomeEstudiante(
                 Modifier.fillMaxWidth(),
 
             colors =
-                CardDefaults.cardColors(
-                    containerColor =
-                        Paleta.AzulClaro
-                ),
+                CardDefaults
+                    .cardColors(
+                        containerColor =
+                            Paleta.AzulClaro
+                    ),
 
             shape =
-                RoundedCornerShape(16.dp)
+                RoundedCornerShape(
+                    16.dp
+                )
         ) {
 
             Column(
                 modifier =
-                    Modifier.padding(16.dp)
+                    Modifier.padding(
+                        16.dp
+                    )
             ) {
 
                 Row(
@@ -344,7 +451,8 @@ fun PantallaHomeEstudiante(
 
                     Icon(
                         imageVector =
-                            Icons.Default.Notifications,
+                            Icons.Default
+                                .Notifications,
 
                         contentDescription =
                             null,
@@ -355,8 +463,9 @@ fun PantallaHomeEstudiante(
 
 
                     Spacer(
-                        modifier =
-                            Modifier.width(10.dp)
+                        Modifier.width(
+                            10.dp
+                        )
                     )
 
 
@@ -376,9 +485,21 @@ fun PantallaHomeEstudiante(
 
                         Text(
                             text =
-                                "Puedes recibir un recordatorio para continuar tu avance.",
 
-                            fontSize = 12.sp,
+                                if (
+                                    asignaturaSugerida !=
+                                    null
+                                ) {
+
+                                    "Recibe un recordatorio para continuar ${asignaturaSugerida.nombre}."
+
+                                } else {
+
+                                    "Disponible cuando UTP autorice una unidad."
+                                },
+
+                            fontSize =
+                                12.sp,
 
                             color =
                                 Paleta.TextoSuave
@@ -388,27 +509,36 @@ fun PantallaHomeEstudiante(
 
 
                 Spacer(
-                    modifier =
-                        Modifier.height(12.dp)
+                    Modifier.height(
+                        12.dp
+                    )
                 )
 
 
                 Button(
+                    enabled =
+                        asignaturaSugerida !=
+                                null,
+
                     onClick = {
 
-                        /*
-                         * Android 13 o superior:
-                         * comprobamos el permiso.
-                         */
+                        val sugerida =
+                            asignaturaSugerida
+                                ?: return@Button
+
+
                         if (
                             Build.VERSION.SDK_INT >=
-                            Build.VERSION_CODES.TIRAMISU
+                            Build.VERSION_CODES
+                                .TIRAMISU
                         ) {
 
                             val permiso =
                                 ContextCompat
                                     .checkSelfPermission(
+
                                         context,
+
                                         Manifest.permission
                                             .POST_NOTIFICATIONS
                                     )
@@ -423,8 +553,10 @@ fun PantallaHomeEstudiante(
                                 val enviada =
                                     NotificationHelper
                                         .mostrarRecordatorio(
+
                                             context,
-                                            asignaturaSugerida.nombre
+
+                                            sugerida.nombre
                                         )
 
 
@@ -441,30 +573,23 @@ fun PantallaHomeEstudiante(
 
                             } else {
 
-                                /*
-                                 * Aparecerá la ventana
-                                 * nativa de Android:
-                                 *
-                                 * ¿Permitir notificaciones?
-                                 */
-                                permisoNotificaciones.launch(
-                                    Manifest.permission
-                                        .POST_NOTIFICATIONS
-                                )
+                                permisoNotificaciones
+                                    .launch(
+
+                                        Manifest.permission
+                                            .POST_NOTIFICATIONS
+                                    )
                             }
 
                         } else {
 
-                            /*
-                             * Android 12 o inferior
-                             * no necesita este permiso
-                             * en tiempo de ejecución.
-                             */
                             val enviada =
                                 NotificationHelper
                                     .mostrarRecordatorio(
+
                                         context,
-                                        asignaturaSugerida.nombre
+
+                                        sugerida.nombre
                                     )
 
 
@@ -492,12 +617,15 @@ fun PantallaHomeEstudiante(
                             ),
 
                     shape =
-                        RoundedCornerShape(12.dp)
+                        RoundedCornerShape(
+                            12.dp
+                        )
                 ) {
 
                     Icon(
                         imageVector =
-                            Icons.Default.Notifications,
+                            Icons.Default
+                                .Notifications,
 
                         contentDescription =
                             null
@@ -505,8 +633,9 @@ fun PantallaHomeEstudiante(
 
 
                     Spacer(
-                        modifier =
-                            Modifier.width(8.dp)
+                        Modifier.width(
+                            8.dp
+                        )
                     )
 
 
@@ -521,15 +650,18 @@ fun PantallaHomeEstudiante(
                     ?.let { mensaje ->
 
                         Spacer(
-                            modifier =
-                                Modifier.height(8.dp)
+                            Modifier.height(
+                                8.dp
+                            )
                         )
 
 
                         Text(
-                            text = mensaje,
+                            text =
+                                mensaje,
 
-                            fontSize = 12.sp,
+                            fontSize =
+                                12.sp,
 
                             color =
                                 Paleta.TextoSuave
@@ -540,7 +672,9 @@ fun PantallaHomeEstudiante(
 
 
         Spacer(
-            modifier = Modifier.height(20.dp)
+            Modifier.height(
+                20.dp
+            )
         )
 
 
@@ -549,15 +683,24 @@ fun PantallaHomeEstudiante(
         // -------------------------
 
         Text(
-            text = "Tus asignaturas",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Paleta.Texto
+            text =
+                "Tus asignaturas",
+
+            fontSize =
+                18.sp,
+
+            fontWeight =
+                FontWeight.Bold,
+
+            color =
+                Paleta.Texto
         )
 
 
         Spacer(
-            modifier = Modifier.height(8.dp)
+            Modifier.height(
+                8.dp
+            )
         )
 
 
@@ -565,27 +708,62 @@ fun PantallaHomeEstudiante(
             .asignaturas
             .forEach { item ->
 
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            vertical = 5.dp
+                val disponible =
+                    GestionAcademicaRepository
+                        .unidadDisponibleEstudiante(
+                            item.id
                         )
-                        .clickable {
 
-                            navController.navigate(
-                                "detalle_unidad/${item.id}"
+
+                val motivoBloqueo =
+                    GestionAcademicaRepository
+                        .motivoBloqueoEstudiante(
+                            item.id
+                        )
+
+
+                Card(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                vertical =
+                                    5.dp
                             )
-                        },
+                            .clickable(
+                                enabled =
+                                    disponible
+                            ) {
+
+                                navController
+                                    .navigate(
+
+                                        "detalle_unidad/${item.id}"
+                                    )
+                            },
 
                     colors =
-                        CardDefaults.cardColors(
-                            containerColor =
-                                Color.White
-                        ),
+                        CardDefaults
+                            .cardColors(
+
+                                containerColor =
+
+                                    if (
+                                        disponible
+                                    ) {
+
+                                        Color.White
+
+                                    } else {
+
+                                        Paleta.Bloqueado
+                                    }
+                            ),
 
                     shape =
-                        RoundedCornerShape(12.dp)
+                        RoundedCornerShape(
+                            12.dp
+                        )
                 ) {
 
                     Row(
@@ -600,7 +778,9 @@ fun PantallaHomeEstudiante(
 
                         Column(
                             modifier =
-                                Modifier.weight(1f)
+                                Modifier.weight(
+                                    1f
+                                )
                         ) {
 
                             Text(
@@ -614,7 +794,17 @@ fun PantallaHomeEstudiante(
                                     14.sp,
 
                                 color =
-                                    Paleta.Texto
+
+                                    if (
+                                        disponible
+                                    ) {
+
+                                        Paleta.Texto
+
+                                    } else {
+
+                                        Paleta.TextoSuave
+                                    }
                             )
 
 
@@ -631,40 +821,75 @@ fun PantallaHomeEstudiante(
 
 
                             Spacer(
-                                modifier =
-                                    Modifier.height(6.dp)
+                                Modifier.height(
+                                    5.dp
+                                )
                             )
 
 
-                            LinearProgressIndicator(
-                                progress = {
+                            if (
+                                disponible
+                            ) {
 
-                                    ProgresoRepository
-                                        .avance(
-                                            item.id
-                                        )
-                                },
+                                LinearProgressIndicator(
+                                    progress = {
 
-                                modifier =
-                                    Modifier
-                                        .fillMaxWidth(
-                                            0.6f
+                                        ProgresoRepository
+                                            .avance(
+                                                item.id
+                                            )
+                                    },
+
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth(
+                                                0.65f
+                                            ),
+
+                                    color =
+                                        Color(
+                                            item.colorHex
                                         ),
 
-                                color =
-                                    Color(
-                                        item.colorHex
-                                    ),
+                                    trackColor =
+                                        Paleta.Borde
+                                )
 
-                                trackColor =
-                                    Paleta.Borde
-                            )
+                            } else {
+
+                                Text(
+                                    text =
+                                        motivoBloqueo
+                                            ?: "Unidad no disponible",
+
+                                    fontSize =
+                                        11.sp,
+
+                                    fontWeight =
+                                        FontWeight.Medium,
+
+                                    color =
+                                        Paleta.TextoSuave
+                                )
+                            }
                         }
 
 
                         Icon(
                             imageVector =
-                                Icons.Default.ChevronRight,
+
+                                if (
+                                    disponible
+                                ) {
+
+                                    Icons.Default
+                                        .ChevronRight
+
+                                } else {
+
+                                    Icons.Default
+                                        .Lock
+                                },
 
                             contentDescription =
                                 null,

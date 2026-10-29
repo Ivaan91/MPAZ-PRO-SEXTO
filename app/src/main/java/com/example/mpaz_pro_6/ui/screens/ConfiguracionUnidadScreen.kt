@@ -1,12 +1,5 @@
 package com.example.mpaz_pro_6.ui.screens
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.togetherWith
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,8 +11,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.mpaz_pro_6.model.EstadoRevisionUnidad
 import com.example.mpaz_pro_6.model.MockRepository
 import com.example.mpaz_pro_6.ui.theme.Paleta
 import com.example.mpaz_pro_6.viewmodel.ConfiguracionUnidadViewModel
@@ -42,64 +38,80 @@ fun PantallaConfiguracionUnidad(
 ) {
 
     val configuracionViewModel:
-            ConfiguracionUnidadViewModel = viewModel()
+            ConfiguracionUnidadViewModel =
+        viewModel()
+
 
     val uiState by
-    configuracionViewModel.uiState.collectAsState()
+    configuracionViewModel
+        .uiState
+        .collectAsState()
 
 
     val asignatura =
-        MockRepository.asignaturaDe(
-            uiState.asignaturaId
-        )
+        MockRepository
+            .asignaturaDe(
+                uiState.asignaturaId
+            )
+
 
     val unidad =
-        MockRepository.unidadDe(
-            uiState.asignaturaId
-        )
+        MockRepository
+            .unidadDe(
+                uiState.asignaturaId
+            )
 
 
-    // Estado visual para abrir/cerrar
-    // el selector de asignaturas.
-    var menuAsignaturasAbierto by remember {
+    var menuAsignaturas by remember {
+        mutableStateOf(false)
+    }
+
+
+    var menuOa by remember {
         mutableStateOf(false)
     }
 
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Paleta.Fondo)
-            .statusBarsPadding()
-            .navigationBarsPadding()
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(
+                    Paleta.Fondo
+                )
+                .statusBarsPadding()
+                .navigationBarsPadding()
     ) {
 
-        // -------------------------
-        // ENCABEZADO
-        // -------------------------
-
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = 12.dp,
-                    vertical = 8.dp
-                ),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = 12.dp,
+                        vertical = 8.dp
+                    ),
+
             verticalAlignment =
                 Alignment.CenterVertically
         ) {
 
             IconButton(
                 onClick = {
-                    navController.popBackStack()
+                    navController
+                        .popBackStack()
                 }
             ) {
 
                 Icon(
                     imageVector =
                         Icons.Default.ArrowBack,
-                    contentDescription = "Volver",
-                    tint = Paleta.Texto
+
+                    contentDescription =
+                        "Volver",
+
+                    tint =
+                        Paleta.Texto
                 )
             }
 
@@ -107,78 +119,93 @@ fun PantallaConfiguracionUnidad(
             Column {
 
                 Text(
-                    text = "Configuración de unidad",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Paleta.Texto
+                    text =
+                        "Configuración de unidad",
+
+                    fontSize =
+                        20.sp,
+
+                    fontWeight =
+                        FontWeight.Bold,
+
+                    color =
+                        Paleta.Texto
                 )
 
+
                 Text(
-                    text = "Vista docente",
-                    fontSize = 12.sp,
-                    color = Paleta.TextoSuave
+                    text =
+                        "Vista docente",
+
+                    fontSize =
+                        12.sp,
+
+                    color =
+                        Paleta.TextoSuave
                 )
             }
         }
 
 
         HorizontalDivider(
-            color = Paleta.Borde
+            color =
+                Paleta.Borde
         )
 
 
-        // -------------------------
-        // CONTENIDO
-        // -------------------------
-
         Column(
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(
-                    rememberScrollState()
-                )
-                .padding(20.dp)
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .verticalScroll(
+                        rememberScrollState()
+                    )
+                    .padding(20.dp)
         ) {
 
+            // -------------------------
+            // ASIGNATURA
+            // -------------------------
+
             Text(
-                text = "Asignatura",
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold,
-                color = Paleta.Texto
+                text =
+                    "Asignatura",
+
+                fontWeight =
+                    FontWeight.Bold,
+
+                color =
+                    Paleta.Texto
             )
 
 
             Spacer(
-                modifier = Modifier.height(8.dp)
+                Modifier.height(8.dp)
             )
 
 
-            // -------------------------
-            // SELECTOR DE ASIGNATURA
-            // -------------------------
-
-            Box(
-                modifier =
-                    Modifier.fillMaxWidth()
-            ) {
+            Box {
 
                 OutlinedCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-
-                            menuAsignaturasAbierto =
-                                true
-                        },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                menuAsignaturas =
+                                    true
+                            },
 
                     shape =
-                        RoundedCornerShape(12.dp)
+                        RoundedCornerShape(
+                            12.dp
+                        )
                 ) {
 
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
 
                         verticalAlignment =
                             Alignment.CenterVertically
@@ -194,10 +221,7 @@ fun PantallaConfiguracionUnidad(
                                     asignatura.nombre,
 
                                 fontWeight =
-                                    FontWeight.Bold,
-
-                                color =
-                                    Paleta.Texto
+                                    FontWeight.Bold
                             )
 
 
@@ -205,7 +229,8 @@ fun PantallaConfiguracionUnidad(
                                 text =
                                     asignatura.unidad,
 
-                                fontSize = 12.sp,
+                                fontSize =
+                                    12.sp,
 
                                 color =
                                     Paleta.TextoSuave
@@ -215,10 +240,11 @@ fun PantallaConfiguracionUnidad(
 
                         Icon(
                             imageVector =
-                                Icons.Default.ArrowDropDown,
+                                Icons.Default
+                                    .ArrowDropDown,
 
                             contentDescription =
-                                "Seleccionar asignatura"
+                                null
                         )
                     }
                 }
@@ -226,11 +252,10 @@ fun PantallaConfiguracionUnidad(
 
                 DropdownMenu(
                     expanded =
-                        menuAsignaturasAbierto,
+                        menuAsignaturas,
 
                     onDismissRequest = {
-
-                        menuAsignaturasAbierto =
+                        menuAsignaturas =
                             false
                     }
                 ) {
@@ -243,30 +268,10 @@ fun PantallaConfiguracionUnidad(
 
                                 text = {
 
-                                    Column {
-
-                                        Text(
-                                            text =
-                                                opcion.nombre,
-
-                                            fontWeight =
-                                                FontWeight.Medium
-                                        )
-
-
-                                        Text(
-                                            text =
-                                                opcion.unidad,
-
-                                            fontSize =
-                                                11.sp,
-
-                                            color =
-                                                Paleta.TextoSuave
-                                        )
-                                    }
+                                    Text(
+                                        opcion.nombre
+                                    )
                                 },
-
 
                                 onClick = {
 
@@ -275,7 +280,7 @@ fun PantallaConfiguracionUnidad(
                                             opcion.id
                                         )
 
-                                    menuAsignaturasAbierto =
+                                    menuAsignaturas =
                                         false
                                 }
                             )
@@ -285,189 +290,349 @@ fun PantallaConfiguracionUnidad(
 
 
             Spacer(
-                modifier = Modifier.height(20.dp)
+                Modifier.height(20.dp)
             )
 
 
             // -------------------------
-            // INFORMACIÓN DE UNIDAD
+            // UNIDAD
             // -------------------------
 
-            Text(
-                text = "Unidad seleccionada",
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold,
-                color = Paleta.Texto
-            )
+            Card(
+                modifier =
+                    Modifier.fillMaxWidth(),
 
-
-            Spacer(
-                modifier = Modifier.height(8.dp)
-            )
-
-
-            /*
-             * AnimatedContent:
-             *
-             * Cada vez que cambia la asignatura,
-             * esta tarjeta hace un pequeño fade.
-             */
-            AnimatedContent(
-
-                targetState =
-                    uiState.asignaturaId,
-
-                transitionSpec = {
-
-                    fadeIn(
-                        animationSpec =
-                            tween(250)
-                    ) togetherWith
-
-                            fadeOut(
-                                animationSpec =
-                                    tween(180)
-                            )
-                },
-
-                label =
-                    "animacion_unidad"
-            ) {
-
-                Card(
-                    modifier =
-                        Modifier.fillMaxWidth(),
-
-                    colors =
-                        CardDefaults.cardColors(
+                colors =
+                    CardDefaults
+                        .cardColors(
                             containerColor =
                                 Color.White
                         ),
 
-                    shape =
-                        RoundedCornerShape(16.dp)
+                shape =
+                    RoundedCornerShape(
+                        16.dp
+                    )
+            ) {
+
+                Column(
+                    modifier =
+                        Modifier.padding(
+                            16.dp
+                        )
                 ) {
 
-                    Column(
+                    Text(
+                        text =
+                            unidad.etiqueta,
+
+                        color =
+                            Paleta.Azul,
+
+                        fontSize =
+                            12.sp,
+
+                        fontWeight =
+                            FontWeight.Bold
+                    )
+
+
+                    Text(
+                        text =
+                            unidad.titulo,
+
+                        fontSize =
+                            19.sp,
+
+                        fontWeight =
+                            FontWeight.Bold,
+
+                        color =
+                            Paleta.Texto
+                    )
+
+
+                    Spacer(
+                        Modifier.height(8.dp)
+                    )
+
+
+                    Text(
+                        text =
+                            unidad.objetivo,
+
+                        fontSize =
+                            13.sp,
+
+                        color =
+                            Paleta.TextoSuave
+                    )
+                }
+            }
+
+
+            Spacer(
+                Modifier.height(24.dp)
+            )
+
+
+            // -------------------------
+            // OA
+            // -------------------------
+
+            Text(
+                text =
+                    "Objetivo de aprendizaje",
+
+                fontSize =
+                    15.sp,
+
+                fontWeight =
+                    FontWeight.Bold,
+
+                color =
+                    Paleta.Texto
+            )
+
+
+            Text(
+                text =
+                    "Selecciona el OA que trabajará esta unidad.",
+
+                fontSize =
+                    12.sp,
+
+                color =
+                    Paleta.TextoSuave
+            )
+
+
+            Spacer(
+                Modifier.height(8.dp)
+            )
+
+
+            Box {
+
+                OutlinedCard(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                menuOa =
+                                    true
+                            },
+
+                    shape =
+                        RoundedCornerShape(
+                            12.dp
+                        )
+                ) {
+
+                    Row(
                         modifier =
-                            Modifier.padding(16.dp)
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    16.dp
+                                ),
+
+                        verticalAlignment =
+                            Alignment.CenterVertically
                     ) {
 
                         Text(
-                            text = unidad.etiqueta,
-                            color = Paleta.Azul,
-                            fontSize = 12.sp,
-                            fontWeight =
-                                FontWeight.Bold
-                        )
-
-
-                        Spacer(
-                            modifier =
-                                Modifier.height(4.dp)
-                        )
-
-
-                        Text(
-                            text = unidad.titulo,
-                            fontSize = 18.sp,
-                            fontWeight =
-                                FontWeight.Bold,
-                            color = Paleta.Texto
-                        )
-
-
-                        Spacer(
-                            modifier =
-                                Modifier.height(12.dp)
-                        )
-
-
-                        Text(
                             text =
-                                "Objetivo de aprendizaje",
+                                uiState.oaSeleccionado,
 
-                            fontSize = 12.sp,
-
-                            color =
-                                Paleta.TextoSuave
-                        )
-
-
-                        Text(
-                            text = unidad.oa,
+                            modifier =
+                                Modifier.weight(1f),
 
                             fontWeight =
                                 FontWeight.Bold,
-
-                            color = Paleta.Texto
-                        )
-
-
-                        Spacer(
-                            modifier =
-                                Modifier.height(12.dp)
-                        )
-
-
-                        Text(
-                            text = "Objetivo",
-                            fontSize = 12.sp,
-                            color =
-                                Paleta.TextoSuave
-                        )
-
-
-                        Text(
-                            text =
-                                unidad.objetivo,
-
-                            fontSize = 14.sp,
 
                             color =
                                 Paleta.Texto
                         )
 
 
-                        Spacer(
-                            modifier =
-                                Modifier.height(12.dp)
-                        )
+                        Icon(
+                            imageVector =
+                                Icons.Default
+                                    .ArrowDropDown,
 
-
-                        Text(
-                            text =
-                                "${unidad.contenidos.size} contenido(s) disponibles",
-
-                            fontSize = 12.sp,
-
-                            color =
-                                Paleta.TextoSuave
+                            contentDescription =
+                                null
                         )
                     }
+                }
+
+
+                DropdownMenu(
+                    expanded =
+                        menuOa,
+
+                    onDismissRequest = {
+                        menuOa =
+                            false
+                    }
+                ) {
+
+                    uiState
+                        .oaDisponibles
+                        .forEach { oa ->
+
+                            DropdownMenuItem(
+
+                                text = {
+                                    Text(oa)
+                                },
+
+                                onClick = {
+
+                                    configuracionViewModel
+                                        .seleccionarOa(
+                                            oa
+                                        )
+
+                                    menuOa =
+                                        false
+                                }
+                            )
+                        }
                 }
             }
 
 
+            uiState.errorConfiguracion
+                ?.let { error ->
+
+                    Spacer(
+                        Modifier.height(6.dp)
+                    )
+
+
+                    Text(
+                        text =
+                            error,
+
+                        fontSize =
+                            12.sp,
+
+                        color =
+                            MaterialTheme
+                                .colorScheme
+                                .error
+                    )
+                }
+
+
             Spacer(
-                modifier = Modifier.height(24.dp)
+                Modifier.height(24.dp)
             )
 
 
             // -------------------------
-            // CONFIGURACIÓN DE PRUEBA
+            // CONTENIDOS
             // -------------------------
 
             Text(
-                text = "Prueba final",
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold,
-                color = Paleta.Texto
+                text =
+                    "Asignación académica",
+
+                fontSize =
+                    15.sp,
+
+                fontWeight =
+                    FontWeight.Bold,
+
+                color =
+                    Paleta.Texto
             )
 
 
             Spacer(
-                modifier = Modifier.height(8.dp)
+                Modifier.height(8.dp)
+            )
+
+
+            ConfiguracionSwitch(
+                icono =
+                    Icons.Default.MenuBook,
+
+                titulo =
+                    "Contenido explicativo",
+
+                descripcion =
+                    "${unidad.contenidos.size} contenido(s) disponibles",
+
+                activado =
+                    uiState.contenidoAsignado,
+
+                onCambio = {
+
+                    configuracionViewModel
+                        .cambiarContenidoAsignado(
+                            it
+                        )
+                }
+            )
+
+
+            Spacer(
+                Modifier.height(8.dp)
+            )
+
+
+            ConfiguracionSwitch(
+                icono =
+                    Icons.Default.EmojiEvents,
+
+                titulo =
+                    "Desafío aplicado",
+
+                descripcion =
+                    "Asignar desafío antes de la prueba final",
+
+                activado =
+                    uiState.desafioAsignado,
+
+                onCambio = {
+
+                    configuracionViewModel
+                        .cambiarDesafioAsignado(
+                            it
+                        )
+                }
+            )
+
+
+            Spacer(
+                Modifier.height(24.dp)
+            )
+
+
+            // -------------------------
+            // INTENTOS
+            // -------------------------
+
+            Text(
+                text =
+                    "Prueba final",
+
+                fontSize =
+                    15.sp,
+
+                fontWeight =
+                    FontWeight.Bold,
+
+                color =
+                    Paleta.Texto
+            )
+
+
+            Spacer(
+                Modifier.height(8.dp)
             )
 
 
@@ -478,17 +643,16 @@ fun PantallaConfiguracionUnidad(
                 onValueChange = {
 
                     configuracionViewModel
-                        .cambiarLimiteIntentos(it)
+                        .cambiarLimiteIntentos(
+                            it
+                        )
                 },
 
                 label = {
-
                     Text(
                         "Cantidad máxima de intentos"
                     )
                 },
-
-                singleLine = true,
 
                 keyboardOptions =
                     KeyboardOptions(
@@ -496,13 +660,18 @@ fun PantallaConfiguracionUnidad(
                             KeyboardType.Number
                     ),
 
+                singleLine =
+                    true,
+
                 isError =
-                    uiState.errorIntentos != null,
+                    uiState.errorIntentos !=
+                            null,
 
                 trailingIcon = {
 
                     if (
-                        uiState.errorIntentos != null
+                        uiState.errorIntentos !=
+                        null
                     ) {
 
                         Icon(
@@ -520,100 +689,50 @@ fun PantallaConfiguracionUnidad(
                     }
                 },
 
+                supportingText = {
+
+                    uiState.errorIntentos
+                        ?.let { error ->
+
+                            Text(
+                                text =
+                                    error
+                            )
+                        }
+                },
+
                 modifier =
                     Modifier.fillMaxWidth()
             )
 
 
-            // -------------------------
-            // ERROR ANIMADO
-            // -------------------------
-
-            AnimatedContent(
-
-                targetState =
-                    uiState.errorIntentos,
-
-                transitionSpec = {
-
-                    (
-                            fadeIn(
-                                animationSpec =
-                                    tween(200)
-                            ) +
-
-                                    expandVertically(
-                                        animationSpec =
-                                            tween(250)
-                                    )
-                            ) togetherWith
-
-                            (
-                                    fadeOut(
-                                        animationSpec =
-                                            tween(150)
-                                    ) +
-
-                                            shrinkVertically(
-                                                animationSpec =
-                                                    tween(200)
-                                            )
-                                    )
-                },
-
-                label =
-                    "animacion_error_intentos"
-            ) { mensajeError ->
-
-                if (mensajeError != null) {
-
-                    Text(
-                        text =
-                            mensajeError,
-
-                        color =
-                            MaterialTheme
-                                .colorScheme
-                                .error,
-
-                        fontSize = 12.sp,
-
-                        modifier =
-                            Modifier.padding(
-                                start = 16.dp,
-                                top = 6.dp
-                            )
-                    )
-                }
-            }
-
-
             Spacer(
-                modifier = Modifier.height(8.dp)
+                Modifier.height(12.dp)
             )
 
-
-            // -------------------------
-            // INFORMACIÓN DE AYUDA
-            // -------------------------
 
             Card(
                 modifier =
                     Modifier.fillMaxWidth(),
 
                 colors =
-                    CardDefaults.cardColors(
-                        containerColor =
-                            Paleta.AzulClaro
-                    ),
+                    CardDefaults
+                        .cardColors(
+                            containerColor =
+                                Paleta.AzulClaro
+                        ),
 
                 shape =
-                    RoundedCornerShape(12.dp)
+                    RoundedCornerShape(
+                        12.dp
+                    )
             ) {
 
                 Row(
                     modifier =
-                        Modifier.padding(14.dp),
+                        Modifier.padding(
+                            14.dp
+                        ),
 
                     verticalAlignment =
                         Alignment.Top
@@ -632,17 +751,16 @@ fun PantallaConfiguracionUnidad(
 
 
                     Spacer(
-                        modifier =
-                            Modifier.width(10.dp)
+                        Modifier.width(10.dp)
                     )
 
 
                     Text(
                         text =
-                            "El estudiante podrá realizar la prueba final entre 1 y 10 veces. " +
-                                    "Cuando alcance el límite, ya no podrá iniciar un nuevo intento.",
+                            "Al guardar cambios, la unidad volverá al estado En revisión. UTP deberá autorizarla antes de que el estudiante pueda acceder.",
 
-                        fontSize = 13.sp,
+                        fontSize =
+                            13.sp,
 
                         color =
                             Paleta.AzulOscuro
@@ -651,126 +769,176 @@ fun PantallaConfiguracionUnidad(
             }
 
 
-            // -------------------------
-            // MENSAJE DE ÉXITO ANIMADO
-            // -------------------------
-
-            AnimatedContent(
-
-                targetState =
-                    uiState.mensajeGuardado,
-
-                transitionSpec = {
-
-                    (
-                            fadeIn(
-                                animationSpec =
-                                    tween(250)
-                            ) +
-
-                                    expandVertically(
-                                        animationSpec =
-                                            tween(300)
-                                    )
-                            ) togetherWith
-
-                            (
-                                    fadeOut(
-                                        animationSpec =
-                                            tween(150)
-                                    ) +
-
-                                            shrinkVertically(
-                                                animationSpec =
-                                                    tween(200)
-                                            )
-                                    )
-                },
-
-                label =
-                    "animacion_guardado"
-            ) { mensaje ->
-
-                if (mensaje != null) {
-
-                    Column {
-
-                        Spacer(
-                            modifier =
-                                Modifier.height(16.dp)
-                        )
-
-
-                        Card(
-                            modifier =
-                                Modifier.fillMaxWidth(),
-
-                            colors =
-                                CardDefaults.cardColors(
-                                    containerColor =
-                                        Paleta.VerdeClaro
-                                ),
-
-                            shape =
-                                RoundedCornerShape(
-                                    12.dp
-                                )
-                        ) {
-
-                            Row(
-                                modifier =
-                                    Modifier.padding(
-                                        14.dp
-                                    ),
-
-                                verticalAlignment =
-                                    Alignment.CenterVertically
-                            ) {
-
-                                Icon(
-                                    imageVector =
-                                        Icons.Default.CheckCircle,
-
-                                    contentDescription =
-                                        null,
-
-                                    tint =
-                                        Paleta.VerdeOscuro
-                                )
-
-
-                                Spacer(
-                                    modifier =
-                                        Modifier.width(
-                                            10.dp
-                                        )
-                                )
-
-
-                                Text(
-                                    text = mensaje,
-
-                                    color =
-                                        Paleta.VerdeOscuro,
-
-                                    fontWeight =
-                                        FontWeight.Medium
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-
             Spacer(
-                modifier = Modifier.height(24.dp)
+                Modifier.height(16.dp)
             )
 
 
             // -------------------------
-            // GUARDAR
+            // ESTADO UTP
             // -------------------------
+
+            Card(
+                modifier =
+                    Modifier.fillMaxWidth(),
+
+                colors =
+                    CardDefaults
+                        .cardColors(
+
+                            containerColor =
+
+                                when (
+                                    uiState.estadoRevision
+                                ) {
+
+                                    EstadoRevisionUnidad
+                                        .AUTORIZADA ->
+                                        Paleta.VerdeClaro
+
+                                    else ->
+                                        Paleta.AmbarClaro
+                                }
+                        ),
+
+                shape =
+                    RoundedCornerShape(
+                        12.dp
+                    )
+            ) {
+
+                Row(
+                    modifier =
+                        Modifier.padding(
+                            14.dp
+                        ),
+
+                    verticalAlignment =
+                        Alignment.CenterVertically
+                ) {
+
+                    Icon(
+                        imageVector =
+                            if (
+                                uiState.estadoRevision ==
+                                EstadoRevisionUnidad
+                                    .AUTORIZADA
+                            ) {
+
+                                Icons.Default
+                                    .CheckCircle
+
+                            } else {
+
+                                Icons.Default.Info
+                            },
+
+                        contentDescription =
+                            null,
+
+                        tint =
+                            if (
+                                uiState.estadoRevision ==
+                                EstadoRevisionUnidad
+                                    .AUTORIZADA
+                            ) {
+
+                                Paleta.VerdeOscuro
+
+                            } else {
+
+                                Paleta.AmbarOscuro
+                            }
+                    )
+
+
+                    Spacer(
+                        Modifier.width(10.dp)
+                    )
+
+
+                    Text(
+                        text =
+                            "Estado UTP: ${uiState.estadoRevision.texto}",
+
+                        fontWeight =
+                            FontWeight.Bold,
+
+                        color =
+                            Paleta.Texto
+                    )
+                }
+            }
+
+
+            uiState.mensajeGuardado
+                ?.let { mensaje ->
+
+                    Spacer(
+                        Modifier.height(
+                            16.dp
+                        )
+                    )
+
+
+                    Card(
+                        modifier =
+                            Modifier.fillMaxWidth(),
+
+                        colors =
+                            CardDefaults
+                                .cardColors(
+                                    containerColor =
+                                        Paleta.VerdeClaro
+                                )
+                    ) {
+
+                        Row(
+                            modifier =
+                                Modifier.padding(
+                                    14.dp
+                                ),
+
+                            verticalAlignment =
+                                Alignment.CenterVertically
+                        ) {
+
+                            Icon(
+                                imageVector =
+                                    Icons.Default
+                                        .CheckCircle,
+
+                                contentDescription =
+                                    null,
+
+                                tint =
+                                    Paleta.VerdeOscuro
+                            )
+
+
+                            Spacer(
+                                Modifier.width(
+                                    8.dp
+                                )
+                            )
+
+
+                            Text(
+                                text =
+                                    mensaje,
+
+                                color =
+                                    Paleta.VerdeOscuro
+                            )
+                        }
+                    }
+                }
+
+
+            Spacer(
+                Modifier.height(24.dp)
+            )
+
 
             Button(
                 onClick = {
@@ -779,26 +947,27 @@ fun PantallaConfiguracionUnidad(
                         .guardarConfiguracion()
                 },
 
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
 
                 colors =
-                    ButtonDefaults.buttonColors(
-                        containerColor =
-                            Paleta.Azul,
-
-                        contentColor =
-                            Color.White
-                    ),
+                    ButtonDefaults
+                        .buttonColors(
+                            containerColor =
+                                Paleta.Azul
+                        ),
 
                 shape =
-                    RoundedCornerShape(12.dp)
+                    RoundedCornerShape(
+                        12.dp
+                    )
             ) {
 
                 Text(
                     text =
-                        "Guardar configuración",
+                        "Guardar y enviar a UTP",
 
                     fontWeight =
                         FontWeight.Bold
@@ -807,7 +976,103 @@ fun PantallaConfiguracionUnidad(
 
 
             Spacer(
-                modifier = Modifier.height(24.dp)
+                Modifier.height(24.dp)
+            )
+        }
+    }
+}
+
+
+@Composable
+private fun ConfiguracionSwitch(
+    icono:
+    androidx.compose.ui.graphics.vector.ImageVector,
+    titulo: String,
+    descripcion: String,
+    activado: Boolean,
+    onCambio: (Boolean) -> Unit
+) {
+
+    Card(
+        modifier =
+            Modifier.fillMaxWidth(),
+
+        colors =
+            CardDefaults
+                .cardColors(
+                    containerColor =
+                        Color.White
+                ),
+
+        shape =
+            RoundedCornerShape(
+                12.dp
+            )
+    ) {
+
+        Row(
+            modifier =
+                Modifier.padding(
+                    14.dp
+                ),
+
+            verticalAlignment =
+                Alignment.CenterVertically
+        ) {
+
+            Icon(
+                imageVector =
+                    icono,
+
+                contentDescription =
+                    null,
+
+                tint =
+                    Paleta.Azul
+            )
+
+
+            Spacer(
+                Modifier.width(12.dp)
+            )
+
+
+            Column(
+                modifier =
+                    Modifier.weight(1f)
+            ) {
+
+                Text(
+                    text =
+                        titulo,
+
+                    fontWeight =
+                        FontWeight.Bold,
+
+                    color =
+                        Paleta.Texto
+                )
+
+
+                Text(
+                    text =
+                        descripcion,
+
+                    fontSize =
+                        12.sp,
+
+                    color =
+                        Paleta.TextoSuave
+                )
+            }
+
+
+            Switch(
+                checked =
+                    activado,
+
+                onCheckedChange =
+                    onCambio
             )
         }
     }

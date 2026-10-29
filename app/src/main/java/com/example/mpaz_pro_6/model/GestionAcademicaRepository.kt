@@ -2,93 +2,75 @@ package com.example.mpaz_pro_6.model
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.compose.runtime.mutableStateMapOf
 import org.json.JSONObject
 
 
 enum class EstadoRevisionUnidad(
     val texto: String
 ) {
-
-    EN_REVISION(
-        "En revisión"
-    ),
-
-    AUTORIZADA(
-        "Autorizada"
-    ),
-
-    CAMBIOS_SOLICITADOS(
-        "Cambios solicitados"
-    )
+    EN_REVISION("En revisión"),
+    AUTORIZADA("Autorizada"),
+    CAMBIOS_SOLICITADOS("Cambios solicitados")
 }
 
 
 data class RevisionUnidad(
-
     val asignaturaId: String,
-
-    val estado:
-    EstadoRevisionUnidad =
+    val estado: EstadoRevisionUnidad =
         EstadoRevisionUnidad.EN_REVISION,
+    val observacion: String = ""
+)
 
-    val observacion:
-    String = ""
+
+data class ConfiguracionAcademicaUnidad(
+    val asignaturaId: String,
+    val oaSeleccionado: String,
+    val contenidoAsignado: Boolean = true,
+    val desafioAsignado: Boolean = true
 )
 
 
 enum class EstadoInformePedagogico(
     val texto: String
 ) {
-
-    PENDIENTE(
-        "Pendiente de validar"
-    ),
-
-    VALIDADO(
-        "Validado"
-    )
+    PENDIENTE("Pendiente de validar"),
+    VALIDADO("Validado")
 }
 
 
 object GestionAcademicaRepository {
 
-
-    private const val
-            PREFERENCIAS =
+    private const val PREFERENCIAS =
         "mpaz_gestion_academica"
 
-
-    private const val
-            CLAVE_DATOS =
+    private const val CLAVE_DATOS =
         "datos_gestion"
 
 
-    private lateinit var
-            preferencias:
+    private lateinit var preferencias:
             SharedPreferences
-
 
     private var inicializado =
         false
 
 
-    // -------------------------
-    // REVISIONES UTP
-    // -------------------------
-
     private val revisiones =
-        mutableMapOf<
+        mutableStateMapOf<
                 String,
                 RevisionUnidad
                 >()
 
 
-    // -------------------------
-    // INFORMES
-    // -------------------------
+    private val configuraciones =
+        mutableStateMapOf<
+                String,
+                ConfiguracionAcademicaUnidad
+                >()
+
 
     private val estadosInforme =
-        mutableMapOf<
+        mutableStateMapOf<
                 String,
                 EstadoInformePedagogico
                 >()
@@ -108,8 +90,7 @@ object GestionAcademicaRepository {
 
 
         preferencias =
-            context
-                .applicationContext
+            context.applicationContext
                 .getSharedPreferences(
                     PREFERENCIAS,
                     Context.MODE_PRIVATE
@@ -125,7 +106,120 @@ object GestionAcademicaRepository {
 
 
     // -------------------------
-    // UTP
+    // CONFIGURACIÓN DOCENTE
+    // -------------------------
+
+    fun configuracionDe(
+        asignaturaId: String
+    ): ConfiguracionAcademicaUnidad {
+
+        return configuraciones[
+            asignaturaId
+        ] ?: configuracionPredeterminada(
+            asignaturaId
+        )
+    }
+
+
+    private fun configuracionPredeterminada(
+        asignaturaId: String
+    ): ConfiguracionAcademicaUnidad {
+
+        val unidad =
+            MockRepository.unidadDe(
+                asignaturaId
+            )
+
+
+        /*
+         * Algunas unidades, como Matemática,
+         * poseen más de un OA escrito como:
+         *
+         * MA06 OA 05 · MA06 OA 06
+         *
+         * Por defecto usamos el primero.
+         */
+        val oaPrincipal =
+            unidad.oa
+                .split(" · ")
+                .firstOrNull()
+                ?.trim()
+                .orEmpty()
+                .ifBlank {
+                    unidad.oa
+                }
+
+
+        return ConfiguracionAcademicaUnidad(
+            asignaturaId =
+                asignaturaId,
+
+            oaSeleccionado =
+                oaPrincipal,
+
+            contenidoAsignado =
+                true,
+
+            desafioAsignado =
+                true
+        )
+    }
+
+
+    fun guardarConfiguracionUnidad(
+        asignaturaId: String,
+        oaSeleccionado: String,
+        contenidoAsignado: Boolean,
+        desafioAsignado: Boolean
+    ) {
+
+        configuraciones[
+            asignaturaId
+        ] =
+            ConfiguracionAcademicaUnidad(
+
+                asignaturaId =
+                    asignaturaId,
+
+                oaSeleccionado =
+                    oaSeleccionado.trim(),
+
+                contenidoAsignado =
+                    contenidoAsignado,
+
+                desafioAsignado =
+                    desafioAsignado
+            )
+
+
+        /*
+         * Si el docente modifica una unidad,
+         * una autorización anterior deja de ser
+         * válida y debe volver a UTP.
+         */
+        revisiones[
+            asignaturaId
+        ] =
+            RevisionUnidad(
+
+                asignaturaId =
+                    asignaturaId,
+
+                estado =
+                    EstadoRevisionUnidad
+                        .EN_REVISION,
+
+                observacion =
+                    ""
+            )
+
+
+        guardarDatos()
+    }
+
+
+    // -------------------------
+    // REVISIÓN UTP
     // -------------------------
 
     fun revisionDe(
@@ -193,7 +287,89 @@ object GestionAcademicaRepository {
 
 
     // -------------------------
-    // INFORMES
+    // DISPONIBILIDAD ESTUDIANTE
+    // -------------------------
+
+    fun unidadDisponibleEstudiante(
+        asignaturaId: String
+    ): Boolean {
+
+        val configuracion =
+            configuracionDe(
+                asignaturaId
+            )
+
+
+        val revision =
+            revisionDe(
+                asignaturaId
+            )
+
+
+        return configuracion
+            .oaSeleccionado
+            .isNotBlank() &&
+
+                configuracion
+                    .contenidoAsignado &&
+
+                configuracion
+                    .desafioAsignado &&
+
+                revision.estado ==
+                EstadoRevisionUnidad
+                    .AUTORIZADA
+    }
+
+
+    fun motivoBloqueoEstudiante(
+        asignaturaId: String
+    ): String? {
+
+        val configuracion =
+            configuracionDe(
+                asignaturaId
+            )
+
+
+        val revision =
+            revisionDe(
+                asignaturaId
+            )
+
+
+        if (
+            configuracion
+                .oaSeleccionado
+                .isBlank() ||
+            !configuracion
+                .contenidoAsignado ||
+            !configuracion
+                .desafioAsignado
+        ) {
+
+            return "Pendiente de configuración docente"
+        }
+
+
+        return when (
+            revision.estado
+        ) {
+
+            EstadoRevisionUnidad.AUTORIZADA ->
+                null
+
+            EstadoRevisionUnidad.EN_REVISION ->
+                "Pendiente de autorización UTP"
+
+            EstadoRevisionUnidad.CAMBIOS_SOLICITADOS ->
+                "UTP solicitó cambios"
+        }
+    }
+
+
+    // -------------------------
+    // INFORME PEDAGÓGICO
     // -------------------------
 
     fun estadoInforme(
@@ -239,6 +415,60 @@ object GestionAcademicaRepository {
                 JSONObject()
 
 
+            // CONFIGURACIONES DOCENTE
+
+            val configuracionesJson =
+                JSONObject()
+
+
+            MockRepository
+                .asignaturas
+                .forEach { asignatura ->
+
+                    val configuracion =
+                        configuracionDe(
+                            asignatura.id
+                        )
+
+
+                    val json =
+                        JSONObject()
+
+
+                    json.put(
+                        "oa",
+                        configuracion
+                            .oaSeleccionado
+                    )
+
+
+                    json.put(
+                        "contenidoAsignado",
+                        configuracion
+                            .contenidoAsignado
+                    )
+
+
+                    json.put(
+                        "desafioAsignado",
+                        configuracion
+                            .desafioAsignado
+                    )
+
+
+                    configuracionesJson.put(
+                        asignatura.id,
+                        json
+                    )
+                }
+
+
+            raiz.put(
+                "configuraciones",
+                configuracionesJson
+            )
+
+
             // REVISIONES UTP
 
             val revisionesJson =
@@ -247,9 +477,7 @@ object GestionAcademicaRepository {
 
             MockRepository
                 .asignaturas
-                .forEach {
-                        asignatura ->
-
+                .forEach { asignatura ->
 
                     val revision =
                         revisionDe(
@@ -257,28 +485,25 @@ object GestionAcademicaRepository {
                         )
 
 
-                    val revisionJson =
+                    val json =
                         JSONObject()
 
 
-                    revisionJson.put(
+                    json.put(
                         "estado",
-                        revision
-                            .estado
-                            .name
+                        revision.estado.name
                     )
 
 
-                    revisionJson.put(
+                    json.put(
                         "observacion",
-                        revision
-                            .observacion
+                        revision.observacion
                     )
 
 
                     revisionesJson.put(
                         asignatura.id,
-                        revisionJson
+                        json
                     )
                 }
 
@@ -297,9 +522,7 @@ object GestionAcademicaRepository {
 
             MockRepository
                 .asignaturas
-                .forEach {
-                        asignatura ->
-
+                .forEach { asignatura ->
 
                     informesJson.put(
 
@@ -357,6 +580,64 @@ object GestionAcademicaRepository {
                 )
 
 
+            // CONFIGURACIÓN DOCENTE
+
+            val configuracionesJson =
+                raiz.optJSONObject(
+                    "configuraciones"
+                )
+
+
+            MockRepository
+                .asignaturas
+                .forEach { asignatura ->
+
+                    val json =
+                        configuracionesJson
+                            ?.optJSONObject(
+                                asignatura.id
+                            )
+
+
+                    if (json != null) {
+
+                        val predeterminada =
+                            configuracionPredeterminada(
+                                asignatura.id
+                            )
+
+
+                        configuraciones[
+                            asignatura.id
+                        ] =
+                            ConfiguracionAcademicaUnidad(
+
+                                asignaturaId =
+                                    asignatura.id,
+
+                                oaSeleccionado =
+                                    json.optString(
+                                        "oa",
+                                        predeterminada
+                                            .oaSeleccionado
+                                    ),
+
+                                contenidoAsignado =
+                                    json.optBoolean(
+                                        "contenidoAsignado",
+                                        true
+                                    ),
+
+                                desafioAsignado =
+                                    json.optBoolean(
+                                        "desafioAsignado",
+                                        true
+                                    )
+                            )
+                    }
+                }
+
+
             // REVISIONES
 
             val revisionesJson =
@@ -367,37 +648,25 @@ object GestionAcademicaRepository {
 
             MockRepository
                 .asignaturas
-                .forEach {
-                        asignatura ->
+                .forEach { asignatura ->
 
-
-                    val revisionJson =
+                    val json =
                         revisionesJson
                             ?.optJSONObject(
                                 asignatura.id
                             )
 
 
-                    if (
-                        revisionJson != null
-                    ) {
-
-                        val estadoTexto =
-                            revisionJson
-                                .optString(
-                                    "estado",
-                                    EstadoRevisionUnidad
-                                        .EN_REVISION
-                                        .name
-                                )
-
+                    if (json != null) {
 
                         val estado =
                             runCatching {
 
                                 EstadoRevisionUnidad
                                     .valueOf(
-                                        estadoTexto
+                                        json.optString(
+                                            "estado"
+                                        )
                                     )
 
                             }.getOrDefault(
@@ -418,11 +687,10 @@ object GestionAcademicaRepository {
                                     estado,
 
                                 observacion =
-                                    revisionJson
-                                        .optString(
-                                            "observacion",
-                                            ""
-                                        )
+                                    json.optString(
+                                        "observacion",
+                                        ""
+                                    )
                             )
                     }
                 }
@@ -438,9 +706,7 @@ object GestionAcademicaRepository {
 
             MockRepository
                 .asignaturas
-                .forEach {
-                        asignatura ->
-
+                .forEach { asignatura ->
 
                     val estadoTexto =
                         informesJson
@@ -455,7 +721,9 @@ object GestionAcademicaRepository {
                                 .name
 
 
-                    val estado =
+                    estadosInforme[
+                        asignatura.id
+                    ] =
                         runCatching {
 
                             EstadoInformePedagogico
@@ -467,12 +735,6 @@ object GestionAcademicaRepository {
                             EstadoInformePedagogico
                                 .PENDIENTE
                         )
-
-
-                    estadosInforme[
-                        asignatura.id
-                    ] =
-                        estado
                 }
 
         } catch (
