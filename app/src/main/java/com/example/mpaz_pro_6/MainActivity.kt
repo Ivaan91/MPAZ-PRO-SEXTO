@@ -17,90 +17,296 @@ import com.example.mpaz_pro_6.model.Etapa
 import com.example.mpaz_pro_6.ui.screens.*
 import com.example.mpaz_pro_6.ui.theme.MPAZPRO6Theme
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val db = AppDatabase.getDatabase(this)
-        val usuarioDao = db.usuarioDao()
 
-        // Íconos de las barras del sistema siempre oscuros (la app usa fondos claros).
+class MainActivity : ComponentActivity() {
+
+    override fun onCreate(
+        savedInstanceState: Bundle?
+    ) {
+
+        super.onCreate(savedInstanceState)
+
+
+        val db =
+            AppDatabase.getDatabase(this)
+
+        val usuarioDao =
+            db.usuarioDao()
+
+
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.light(
-                android.graphics.Color.TRANSPARENT,
-                android.graphics.Color.TRANSPARENT
-            ),
-            navigationBarStyle = SystemBarStyle.light(
-                android.graphics.Color.TRANSPARENT,
-                android.graphics.Color.TRANSPARENT
-            )
+
+            statusBarStyle =
+                SystemBarStyle.light(
+                    android.graphics.Color.TRANSPARENT,
+                    android.graphics.Color.TRANSPARENT
+                ),
+
+            navigationBarStyle =
+                SystemBarStyle.light(
+                    android.graphics.Color.TRANSPARENT,
+                    android.graphics.Color.TRANSPARENT
+                )
         )
+
+
         setContent {
+
             MPAZPRO6Theme {
-                AppNavigation(usuarioDao)
+
+                AppNavigation(
+                    usuarioDao
+                )
             }
         }
     }
 }
 
+
 @Composable
-fun AppNavigation(usuarioDao: UsuarioDao) {
-    val navController = rememberNavController()
+fun AppNavigation(
+    usuarioDao: UsuarioDao
+) {
 
-    NavHost(navController = navController, startDestination = "login") {
-        composable("login") { PantallaLogin(navController, usuarioDao) }
-        composable("home_estudiante") { PantallaHomeEstudiante(navController) }
+    val navController =
+        rememberNavController()
 
+
+    NavHost(
+        navController = navController,
+        startDestination = "login"
+    ) {
+
+        // LOGIN
         composable(
-            route = "detalle_unidad/{asignaturaId}",
-            arguments = listOf(navArgument("asignaturaId") { type = NavType.StringType })
-        ) { entrada ->
-            PantallaDetalleUnidad(navController, entrada.arguments?.getString("asignaturaId") ?: "3")
+            route = "login"
+        ) {
+
+            PantallaLogin(
+                navController,
+                usuarioDao
+            )
         }
 
+
+        // ESTUDIANTE
         composable(
-            route = "contenido/{asignaturaId}/{indice}",
-            arguments = listOf(
-                navArgument("asignaturaId") { type = NavType.StringType },
-                navArgument("indice") { type = NavType.IntType }
+            route = "home_estudiante"
+        ) {
+
+            PantallaHomeEstudiante(
+                navController
             )
+        }
+
+
+        composable(
+            route =
+                "detalle_unidad/{asignaturaId}",
+
+            arguments =
+                listOf(
+
+                    navArgument(
+                        "asignaturaId"
+                    ) {
+
+                        type =
+                            NavType.StringType
+                    }
+                )
         ) { entrada ->
+
+            PantallaDetalleUnidad(
+
+                navController,
+
+                entrada.arguments
+                    ?.getString(
+                        "asignaturaId"
+                    )
+                    ?: "3"
+            )
+        }
+
+
+        composable(
+            route =
+                "contenido/{asignaturaId}/{indice}",
+
+            arguments =
+                listOf(
+
+                    navArgument(
+                        "asignaturaId"
+                    ) {
+
+                        type =
+                            NavType.StringType
+                    },
+
+                    navArgument(
+                        "indice"
+                    ) {
+
+                        type =
+                            NavType.IntType
+                    }
+                )
+        ) { entrada ->
+
             PantallaContenido(
+
                 navController,
-                entrada.arguments?.getString("asignaturaId") ?: "3",
-                entrada.arguments?.getInt("indice") ?: 0
+
+                entrada.arguments
+                    ?.getString(
+                        "asignaturaId"
+                    )
+                    ?: "3",
+
+                entrada.arguments
+                    ?.getInt(
+                        "indice"
+                    )
+                    ?: 0
             )
         }
 
+
         composable(
-            route = "quiz/{asignaturaId}/{etapa}",
-            arguments = listOf(
-                navArgument("asignaturaId") { type = NavType.StringType },
-                navArgument("etapa") { type = NavType.StringType }
-            )
+            route =
+                "quiz/{asignaturaId}/{etapa}",
+
+            arguments =
+                listOf(
+
+                    navArgument(
+                        "asignaturaId"
+                    ) {
+
+                        type =
+                            NavType.StringType
+                    },
+
+                    navArgument(
+                        "etapa"
+                    ) {
+
+                        type =
+                            NavType.StringType
+                    }
+                )
         ) { entrada ->
+
             PantallaQuiz(
+
                 navController,
-                entrada.arguments?.getString("asignaturaId") ?: "3",
-                Etapa.desdeRuta(entrada.arguments?.getString("etapa") ?: "")
+
+                entrada.arguments
+                    ?.getString(
+                        "asignaturaId"
+                    )
+                    ?: "3",
+
+                Etapa.desdeRuta(
+
+                    entrada.arguments
+                        ?.getString(
+                            "etapa"
+                        )
+                        ?: ""
+                )
             )
         }
+
 
         composable(
-            route = "resultado/{asignaturaId}/{etapa}",
-            arguments = listOf(
-                navArgument("asignaturaId") { type = NavType.StringType },
-                navArgument("etapa") { type = NavType.StringType }
-            )
+            route =
+                "resultado/{asignaturaId}/{etapa}",
+
+            arguments =
+                listOf(
+
+                    navArgument(
+                        "asignaturaId"
+                    ) {
+
+                        type =
+                            NavType.StringType
+                    },
+
+                    navArgument(
+                        "etapa"
+                    ) {
+
+                        type =
+                            NavType.StringType
+                    }
+                )
         ) { entrada ->
+
             PantallaResultadoPrueba(
+
                 navController,
-                entrada.arguments?.getString("asignaturaId") ?: "3",
-                Etapa.desdeRuta(entrada.arguments?.getString("etapa") ?: "")
+
+                entrada.arguments
+                    ?.getString(
+                        "asignaturaId"
+                    )
+                    ?: "3",
+
+                Etapa.desdeRuta(
+
+                    entrada.arguments
+                        ?.getString(
+                            "etapa"
+                        )
+                        ?: ""
+                )
             )
         }
 
-        composable("home_docente") { PantallaHomeDocente(navController) }
-        composable("informe_pedagogico") { PantallaInformePedagogico(navController) }
-        composable("home_utp") { PantallaHomeUTP(navController) }
+
+        // DOCENTE
+        composable(
+            route = "home_docente"
+        ) {
+
+            PantallaHomeDocente(
+                navController
+            )
+        }
+
+
+        composable(
+            route = "configuracion_unidad"
+        ) {
+
+            PantallaConfiguracionUnidad(
+                navController
+            )
+        }
+
+
+        composable(
+            route = "informe_pedagogico"
+        ) {
+
+            PantallaInformePedagogico(
+                navController
+            )
+        }
+
+
+        // UTP
+        composable(
+            route = "home_utp"
+        ) {
+
+            PantallaHomeUTP(
+                navController
+            )
+        }
     }
 }
