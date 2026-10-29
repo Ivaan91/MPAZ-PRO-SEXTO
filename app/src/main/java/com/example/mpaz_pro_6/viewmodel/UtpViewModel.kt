@@ -2,7 +2,10 @@ package com.example.mpaz_pro_6.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.example.mpaz_pro_6.model.EstadoRevisionUnidad
+import com.example.mpaz_pro_6.model.Etapa
 import com.example.mpaz_pro_6.model.GestionAcademicaRepository
+import com.example.mpaz_pro_6.model.MockRepository
+import com.example.mpaz_pro_6.model.ProgresoRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,9 +19,34 @@ data class UtpUiState(
     EstadoRevisionUnidad =
         EstadoRevisionUnidad.EN_REVISION,
 
-    val observacion: String = "",
+    val oaSeleccionado:
+    String = "",
+
+    val contenidoAsignado:
+    Boolean = false,
+
+    val actividadDisponible:
+    Boolean = false,
+
+    val desafioAsignado:
+    Boolean = false,
+
+    val pruebaConfigurada:
+    Boolean = false,
+
+    val limiteIntentos:
+    Int = 3,
+
+    val configuracionCompleta:
+    Boolean = false,
+
+    val observacion:
+    String = "",
 
     val errorObservacion:
+    String? = null,
+
+    val errorAutorizacion:
     String? = null,
 
     val mensaje:
@@ -26,22 +54,14 @@ data class UtpUiState(
 )
 
 
-class UtpViewModel : ViewModel() {
-
-    private val revisionInicial =
-        GestionAcademicaRepository
-            .revisionDe("3")
+class UtpViewModel :
+    ViewModel() {
 
 
     private val _uiState =
         MutableStateFlow(
-
-            UtpUiState(
-                asignaturaId = "3",
-                estado =
-                    revisionInicial.estado,
-                observacion =
-                    revisionInicial.observacion
+            cargarEstado(
+                "3"
             )
         )
 
@@ -51,9 +71,13 @@ class UtpViewModel : ViewModel() {
         _uiState.asStateFlow()
 
 
-    fun seleccionarAsignatura(
+    // -------------------------
+    // CARGAR UNIDAD
+    // -------------------------
+
+    private fun cargarEstado(
         asignaturaId: String
-    ) {
+    ): UtpUiState {
 
         val revision =
             GestionAcademicaRepository
@@ -62,20 +86,133 @@ class UtpViewModel : ViewModel() {
                 )
 
 
-        _uiState.value =
-            UtpUiState(
+        val configuracion =
+            GestionAcademicaRepository
+                .configuracionDe(
+                    asignaturaId
+                )
 
-                asignaturaId =
+
+        val actividadDisponible =
+            MockRepository
+                .preguntasDe(
                     asignaturaId,
+                    Etapa.ACTIVIDAD
+                )
+                .isNotEmpty()
 
-                estado =
-                    revision.estado,
 
-                observacion =
-                    revision.observacion
+        val desafioDisponible =
+            MockRepository
+                .preguntasDe(
+                    asignaturaId,
+                    Etapa.DESAFIO
+                )
+                .isNotEmpty()
+
+
+        val pruebaDisponible =
+            MockRepository
+                .preguntasDe(
+                    asignaturaId,
+                    Etapa.PRUEBA
+                )
+                .isNotEmpty()
+
+
+        val limiteIntentos =
+            ProgresoRepository
+                .limiteIntentos(
+                    asignaturaId
+                )
+
+
+        val contenidoOk =
+            configuracion
+                .contenidoAsignado &&
+                    MockRepository
+                        .unidadDe(
+                            asignaturaId
+                        )
+                        .contenidos
+                        .isNotEmpty()
+
+
+        val desafioOk =
+            configuracion
+                .desafioAsignado &&
+                    desafioDisponible
+
+
+        val pruebaOk =
+            pruebaDisponible &&
+                    limiteIntentos in 1..10
+
+
+        val completa =
+            configuracion
+                .oaSeleccionado
+                .isNotBlank() &&
+                    contenidoOk &&
+                    actividadDisponible &&
+                    desafioOk &&
+                    pruebaOk
+
+
+        return UtpUiState(
+
+            asignaturaId =
+                asignaturaId,
+
+            estado =
+                revision.estado,
+
+            oaSeleccionado =
+                configuracion
+                    .oaSeleccionado,
+
+            contenidoAsignado =
+                contenidoOk,
+
+            actividadDisponible =
+                actividadDisponible,
+
+            desafioAsignado =
+                desafioOk,
+
+            pruebaConfigurada =
+                pruebaOk,
+
+            limiteIntentos =
+                limiteIntentos,
+
+            configuracionCompleta =
+                completa,
+
+            observacion =
+                revision.observacion
+        )
+    }
+
+
+    // -------------------------
+    // CAMBIAR ASIGNATURA
+    // -------------------------
+
+    fun seleccionarAsignatura(
+        asignaturaId: String
+    ) {
+
+        _uiState.value =
+            cargarEstado(
+                asignaturaId
             )
     }
 
+
+    // -------------------------
+    // OBSERVACIÓN
+    // -------------------------
 
     fun cambiarObservacion(
         valor: String
@@ -90,44 +227,87 @@ class UtpViewModel : ViewModel() {
                 errorObservacion =
                     null,
 
+                errorAutorizacion =
+                    null,
+
                 mensaje =
                     null
             )
     }
 
 
-    fun autorizarUnidad() {
+    // -------------------------
+    // AUTORIZAR
+    // -------------------------
 
-        val asignaturaId =
+    fun autorizarUnidad():
+            Boolean {
+
+        val estadoActual =
             _uiState.value
-                .asignaturaId
+
+
+        if (
+            !estadoActual
+                .configuracionCompleta
+        ) {
+
+            _uiState.value =
+                estadoActual.copy(
+
+                    errorAutorizacion =
+                        "No puedes autorizar la unidad porque todavía existen elementos pendientes en la configuración académica.",
+
+                    mensaje =
+                        null
+                )
+
+
+            return false
+        }
 
 
         GestionAcademicaRepository
             .autorizarUnidad(
-                asignaturaId
+                estadoActual
+                    .asignaturaId
             )
 
 
         _uiState.value =
-            _uiState.value.copy(
+            cargarEstado(
+                estadoActual
+                    .asignaturaId
+            ).copy(
 
                 estado =
                     EstadoRevisionUnidad
                         .AUTORIZADA,
 
-                observacion = "",
+                observacion =
+                    "",
 
                 errorObservacion =
+                    null,
+
+                errorAutorizacion =
                     null,
 
                 mensaje =
                     "Unidad autorizada correctamente."
             )
+
+
+        return true
     }
 
 
-    fun solicitarCambios(): Boolean {
+    // -------------------------
+    // SOLICITAR CAMBIOS
+    // -------------------------
+
+    fun solicitarCambios():
+            Boolean {
 
         val estadoActual =
             _uiState.value
@@ -144,6 +324,9 @@ class UtpViewModel : ViewModel() {
 
                     errorObservacion =
                         "Debes indicar qué cambios debe realizar el docente.",
+
+                    errorAutorizacion =
+                        null,
 
                     mensaje =
                         null
@@ -175,6 +358,9 @@ class UtpViewModel : ViewModel() {
                         .CAMBIOS_SOLICITADOS,
 
                 errorObservacion =
+                    null,
+
+                errorAutorizacion =
                     null,
 
                 mensaje =

@@ -34,7 +34,8 @@ fun PantallaHomeUTP(
 ) {
 
     val utpViewModel:
-            UtpViewModel = viewModel()
+            UtpViewModel =
+        viewModel()
 
 
     val uiState by
@@ -63,15 +64,20 @@ fun PantallaHomeUTP(
 
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Paleta.Fondo)
-            .statusBarsPadding()
-            .navigationBarsPadding()
-            .verticalScroll(
-                rememberScrollState()
-            )
-            .padding(20.dp)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(
+                    Paleta.Fondo
+                )
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .verticalScroll(
+                    rememberScrollState()
+                )
+                .padding(
+                    20.dp
+                )
     ) {
 
         // -------------------------
@@ -79,11 +85,17 @@ fun PantallaHomeUTP(
         // -------------------------
 
         Text(
-            text = "Revisión UTP",
+            text =
+                "Revisión UTP",
+
             fontWeight =
                 FontWeight.Bold,
-            fontSize = 22.sp,
-            color = Paleta.Texto
+
+            fontSize =
+                22.sp,
+
+            color =
+                Paleta.Texto
         )
 
 
@@ -91,7 +103,8 @@ fun PantallaHomeUTP(
             text =
                 "Revisa y autoriza las unidades enviadas por el equipo docente.",
 
-            fontSize = 12.sp,
+            fontSize =
+                12.sp,
 
             color =
                 Paleta.TextoSuave
@@ -99,27 +112,35 @@ fun PantallaHomeUTP(
 
 
         Spacer(
-            modifier =
-                Modifier.height(20.dp)
+            Modifier.height(
+                20.dp
+            )
         )
 
 
         // -------------------------
-        // SELECTOR ASIGNATURA
+        // ASIGNATURA
         // -------------------------
 
         Text(
-            text = "Asignatura",
+            text =
+                "Asignatura",
+
             fontWeight =
                 FontWeight.Bold,
-            fontSize = 15.sp,
-            color = Paleta.Texto
+
+            fontSize =
+                15.sp,
+
+            color =
+                Paleta.Texto
         )
 
 
         Spacer(
-            modifier =
-                Modifier.height(8.dp)
+            Modifier.height(
+                8.dp
+            )
         )
 
 
@@ -129,13 +150,14 @@ fun PantallaHomeUTP(
         ) {
 
             OutlinedCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable {
 
-                        menuAbierto =
-                            true
-                    },
+                            menuAbierto =
+                                true
+                        },
 
                 shape =
                     RoundedCornerShape(
@@ -144,9 +166,12 @@ fun PantallaHomeUTP(
             ) {
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                16.dp
+                            ),
 
                     verticalAlignment =
                         Alignment.CenterVertically
@@ -154,7 +179,9 @@ fun PantallaHomeUTP(
 
                     Column(
                         modifier =
-                            Modifier.weight(1f)
+                            Modifier.weight(
+                                1f
+                            )
                     ) {
 
                         Text(
@@ -207,7 +234,8 @@ fun PantallaHomeUTP(
 
                 MockRepository
                     .asignaturas
-                    .forEach { opcion ->
+                    .forEach {
+                            opcion ->
 
                         DropdownMenuItem(
 
@@ -234,13 +262,13 @@ fun PantallaHomeUTP(
                                 }
                             },
 
-
                             onClick = {
 
                                 utpViewModel
                                     .seleccionarAsignatura(
                                         opcion.id
                                     )
+
 
                                 menuAbierto =
                                     false
@@ -252,8 +280,9 @@ fun PantallaHomeUTP(
 
 
         Spacer(
-            modifier =
-                Modifier.height(20.dp)
+            Modifier.height(
+                20.dp
+            )
         )
 
 
@@ -273,12 +302,16 @@ fun PantallaHomeUTP(
                     ),
 
             shape =
-                RoundedCornerShape(16.dp)
+                RoundedCornerShape(
+                    16.dp
+                )
         ) {
 
             Column(
                 modifier =
-                    Modifier.padding(20.dp)
+                    Modifier.padding(
+                        20.dp
+                    )
             ) {
 
                 Text(
@@ -286,7 +319,9 @@ fun PantallaHomeUTP(
                         asignatura.nombre,
 
                     color =
-                        Color(0xFFBFDBFE),
+                        Color(
+                            0xFFBFDBFE
+                        ),
 
                     fontSize =
                         12.sp,
@@ -297,8 +332,9 @@ fun PantallaHomeUTP(
 
 
                 Spacer(
-                    modifier =
-                        Modifier.height(4.dp)
+                    Modifier.height(
+                        4.dp
+                    )
                 )
 
 
@@ -318,28 +354,72 @@ fun PantallaHomeUTP(
 
 
                 Spacer(
-                    modifier =
-                        Modifier.height(8.dp)
+                    Modifier.height(
+                        10.dp
+                    )
                 )
 
 
                 Text(
                     text =
-                        unidad.oa,
+                        "OA seleccionado",
+
+                    color =
+                        Color.White.copy(
+                            alpha = 0.7f
+                        ),
+
+                    fontSize =
+                        11.sp
+                )
+
+
+                Text(
+                    text =
+                        uiState
+                            .oaSeleccionado
+                            .ifBlank {
+                                "Sin OA seleccionado"
+                            },
 
                     color =
                         Color.White,
 
                     fontSize =
-                        13.sp
+                        14.sp,
+
+                    fontWeight =
+                        FontWeight.Bold
+                )
+
+
+                Spacer(
+                    Modifier.height(
+                        8.dp
+                    )
+                )
+
+
+                Text(
+                    text =
+                        "Máximo ${uiState.limiteIntentos} intento(s) en prueba final",
+
+                    color =
+                        Color.White.copy(
+                            alpha = 0.8f
+                        ),
+
+                    fontSize =
+                        12.sp
                 )
             }
         }
 
 
         Spacer(
-            modifier =
-                Modifier.height(16.dp)
+            Modifier.height(
+                16.dp
+            )
         )
 
 
@@ -397,12 +477,16 @@ fun PantallaHomeUTP(
                     ),
 
             shape =
-                RoundedCornerShape(12.dp)
+                RoundedCornerShape(
+                    12.dp
+                )
         ) {
 
             Row(
                 modifier =
-                    Modifier.padding(14.dp),
+                    Modifier.padding(
+                        14.dp
+                    ),
 
                 verticalAlignment =
                     Alignment.CenterVertically
@@ -417,16 +501,21 @@ fun PantallaHomeUTP(
 
                             EstadoRevisionUnidad
                                 .AUTORIZADA ->
+
                                 Icons.Default
                                     .CheckCircle
 
+
                             EstadoRevisionUnidad
                                 .CAMBIOS_SOLICITADOS ->
+
                                 Icons.Default
                                     .Warning
 
+
                             EstadoRevisionUnidad
                                 .EN_REVISION ->
+
                                 Icons.Default
                                     .Info
                         },
@@ -440,28 +529,56 @@ fun PantallaHomeUTP(
 
 
                 Spacer(
-                    modifier =
-                        Modifier.width(10.dp)
+                    Modifier.width(
+                        10.dp
+                    )
                 )
 
 
-                Text(
-                    text =
-                        "Estado: ${uiState.estado.texto}",
+                Column {
 
-                    fontWeight =
-                        FontWeight.Bold,
+                    Text(
+                        text =
+                            "Estado: ${uiState.estado.texto}",
 
-                    color =
-                        colorTextoEstado
-                )
+                        fontWeight =
+                            FontWeight.Bold,
+
+                        color =
+                            colorTextoEstado
+                    )
+
+
+                    Text(
+                        text =
+
+                            if (
+                                uiState
+                                    .configuracionCompleta
+                            ) {
+
+                                "La unidad cumple los requisitos para revisión."
+
+                            } else {
+
+                                "La unidad contiene elementos pendientes."
+                            },
+
+                        fontSize =
+                            11.sp,
+
+                        color =
+                            colorTextoEstado
+                    )
+                }
             }
         }
 
 
         Spacer(
-            modifier =
-                Modifier.height(20.dp)
+            Modifier.height(
+                20.dp
+            )
         )
 
 
@@ -484,44 +601,229 @@ fun PantallaHomeUTP(
         )
 
 
-        Spacer(
-            modifier =
-                Modifier.height(10.dp)
-        )
+        Text(
+            text =
+                "Los elementos se verifican automáticamente según la configuración del docente.",
 
+            fontSize =
+                12.sp,
 
-        ItemChecklist(
-            texto =
-                "Objetivo de aprendizaje definido"
-        )
-
-
-        ItemChecklist(
-            texto =
-                "Contenido explicativo disponible"
-        )
-
-
-        ItemChecklist(
-            texto =
-                "Actividad de práctica disponible"
-        )
-
-
-        ItemChecklist(
-            texto =
-                "Desafío y prueba final configurados"
+            color =
+                Paleta.TextoSuave
         )
 
 
         Spacer(
-            modifier =
-                Modifier.height(20.dp)
+            Modifier.height(
+                10.dp
+            )
+        )
+
+
+        ItemChecklist(
+            texto =
+
+                if (
+                    uiState
+                        .oaSeleccionado
+                        .isNotBlank()
+                ) {
+
+                    "Objetivo de aprendizaje: ${uiState.oaSeleccionado}"
+
+                } else {
+
+                    "Objetivo de aprendizaje no seleccionado"
+                },
+
+            cumplido =
+                uiState
+                    .oaSeleccionado
+                    .isNotBlank()
+        )
+
+
+        ItemChecklist(
+            texto =
+                "Contenido explicativo asignado",
+
+            cumplido =
+                uiState
+                    .contenidoAsignado
+        )
+
+
+        ItemChecklist(
+            texto =
+                "Actividad de práctica disponible",
+
+            cumplido =
+                uiState
+                    .actividadDisponible
+        )
+
+
+        ItemChecklist(
+            texto =
+                "Desafío aplicado asignado",
+
+            cumplido =
+                uiState
+                    .desafioAsignado
+        )
+
+
+        ItemChecklist(
+            texto =
+                "Prueba final configurada · ${uiState.limiteIntentos} intento(s)",
+
+            cumplido =
+                uiState
+                    .pruebaConfigurada
+        )
+
+
+        Spacer(
+            Modifier.height(
+                16.dp
+            )
         )
 
 
         // -------------------------
-        // OBSERVACIÓN
+        // RESUMEN CHECKLIST
+        // -------------------------
+
+        Card(
+            modifier =
+                Modifier.fillMaxWidth(),
+
+            colors =
+                CardDefaults
+                    .cardColors(
+
+                        containerColor =
+
+                            if (
+                                uiState
+                                    .configuracionCompleta
+                            ) {
+
+                                Paleta.VerdeClaro
+
+                            } else {
+
+                                Paleta.AmbarClaro
+                            }
+                    ),
+
+            shape =
+                RoundedCornerShape(
+                    12.dp
+                )
+        ) {
+
+            Row(
+                modifier =
+                    Modifier.padding(
+                        14.dp
+                    ),
+
+                verticalAlignment =
+                    Alignment.CenterVertically
+            ) {
+
+                Icon(
+                    imageVector =
+
+                        if (
+                            uiState
+                                .configuracionCompleta
+                        ) {
+
+                            Icons.Default
+                                .CheckCircle
+
+                        } else {
+
+                            Icons.Default
+                                .Warning
+                        },
+
+                    contentDescription =
+                        null,
+
+                    tint =
+
+                        if (
+                            uiState
+                                .configuracionCompleta
+                        ) {
+
+                            Paleta.VerdeOscuro
+
+                        } else {
+
+                            Paleta.AmbarOscuro
+                        }
+                )
+
+
+                Spacer(
+                    Modifier.width(
+                        10.dp
+                    )
+                )
+
+
+                Text(
+                    text =
+
+                        if (
+                            uiState
+                                .configuracionCompleta
+                        ) {
+
+                            "Configuración académica completa."
+
+                        } else {
+
+                            "Faltan elementos antes de poder autorizar esta unidad."
+                        },
+
+                    fontSize =
+                        13.sp,
+
+                    fontWeight =
+                        FontWeight.Medium,
+
+                    color =
+
+                        if (
+                            uiState
+                                .configuracionCompleta
+                        ) {
+
+                            Paleta.VerdeOscuro
+
+                        } else {
+
+                            Paleta.AmbarOscuro
+                        }
+                )
+            }
+        }
+
+
+        Spacer(
+            Modifier.height(
+                20.dp
+            )
+        )
+
+
+        // -------------------------
+        // OBSERVACIONES
         // -------------------------
 
         Text(
@@ -540,8 +842,9 @@ fun PantallaHomeUTP(
 
 
         Spacer(
-            modifier =
-                Modifier.height(8.dp)
+            Modifier.height(
+                8.dp
+            )
         )
 
 
@@ -552,7 +855,9 @@ fun PantallaHomeUTP(
             onValueChange = {
 
                 utpViewModel
-                    .cambiarObservacion(it)
+                    .cambiarObservacion(
+                        it
+                    )
             },
 
             label = {
@@ -569,19 +874,23 @@ fun PantallaHomeUTP(
                 )
             },
 
-            minLines = 3,
+            minLines =
+                3,
 
-            maxLines = 5,
+            maxLines =
+                5,
 
             isError =
-                uiState.errorObservacion
-                        != null,
+                uiState
+                    .errorObservacion !=
+                        null,
 
             trailingIcon = {
 
                 if (
-                    uiState.errorObservacion
-                    != null
+                    uiState
+                        .errorObservacion !=
+                    null
                 ) {
 
                     Icon(
@@ -601,8 +910,10 @@ fun PantallaHomeUTP(
 
             supportingText = {
 
-                uiState.errorObservacion
-                    ?.let { mensaje ->
+                uiState
+                    .errorObservacion
+                    ?.let {
+                            mensaje ->
 
                         Text(
                             text =
@@ -621,12 +932,94 @@ fun PantallaHomeUTP(
         )
 
 
+        // -------------------------
+        // ERROR AUTORIZACIÓN
+        // -------------------------
+
+        uiState
+            .errorAutorizacion
+            ?.let { error ->
+
+                Spacer(
+                    Modifier.height(
+                        12.dp
+                    )
+                )
+
+
+                Card(
+                    modifier =
+                        Modifier.fillMaxWidth(),
+
+                    colors =
+                        CardDefaults
+                            .cardColors(
+                                containerColor =
+                                    Paleta.AmbarClaro
+                            ),
+
+                    shape =
+                        RoundedCornerShape(
+                            12.dp
+                        )
+                ) {
+
+                    Row(
+                        modifier =
+                            Modifier.padding(
+                                14.dp
+                            ),
+
+                        verticalAlignment =
+                            Alignment.Top
+                    ) {
+
+                        Icon(
+                            imageVector =
+                                Icons.Default
+                                    .Warning,
+
+                            contentDescription =
+                                null,
+
+                            tint =
+                                Paleta.AmbarOscuro
+                        )
+
+
+                        Spacer(
+                            Modifier.width(
+                                8.dp
+                            )
+                        )
+
+
+                        Text(
+                            text =
+                                error,
+
+                            fontSize =
+                                13.sp,
+
+                            color =
+                                Paleta.AmbarOscuro
+                        )
+                    }
+                }
+            }
+
+
+        // -------------------------
+        // MENSAJE
+        // -------------------------
+
         uiState.mensaje
             ?.let { mensaje ->
 
                 Spacer(
-                    modifier =
-                        Modifier.height(12.dp)
+                    Modifier.height(
+                        12.dp
+                    )
                 )
 
 
@@ -638,6 +1031,7 @@ fun PantallaHomeUTP(
                         FontWeight.Medium,
 
                     color =
+
                         if (
                             uiState.estado ==
                             EstadoRevisionUnidad
@@ -655,8 +1049,9 @@ fun PantallaHomeUTP(
 
 
         Spacer(
-            modifier =
-                Modifier.height(24.dp)
+            Modifier.height(
+                24.dp
+            )
         )
 
 
@@ -671,12 +1066,17 @@ fun PantallaHomeUTP(
                     .solicitarCambios()
             },
 
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(
+                        50.dp
+                    ),
 
             shape =
-                RoundedCornerShape(12.dp)
+                RoundedCornerShape(
+                    12.dp
+                )
         ) {
 
             Text(
@@ -690,8 +1090,9 @@ fun PantallaHomeUTP(
 
 
         Spacer(
-            modifier =
-                Modifier.height(10.dp)
+            Modifier.height(
+                10.dp
+            )
         )
 
 
@@ -706,24 +1107,31 @@ fun PantallaHomeUTP(
                     .autorizarUnidad()
             },
 
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(
+                        50.dp
+                    ),
 
             colors =
                 ButtonDefaults
                     .buttonColors(
+
                         containerColor =
                             Paleta.Azul
                     ),
 
             shape =
-                RoundedCornerShape(12.dp)
+                RoundedCornerShape(
+                    12.dp
+                )
         ) {
 
             Icon(
                 imageVector =
-                    Icons.Default.CheckCircle,
+                    Icons.Default
+                        .CheckCircle,
 
                 contentDescription =
                     null
@@ -731,21 +1139,34 @@ fun PantallaHomeUTP(
 
 
             Spacer(
-                modifier =
-                    Modifier.width(8.dp)
+                Modifier.width(
+                    8.dp
+                )
             )
 
 
             Text(
                 text =
-                    "Autorizar unidad"
+                    if (
+                        uiState.estado ==
+                        EstadoRevisionUnidad
+                            .AUTORIZADA
+                    ) {
+
+                        "Unidad autorizada"
+
+                    } else {
+
+                        "Autorizar unidad"
+                    }
             )
         }
 
 
         Spacer(
-            modifier =
-                Modifier.height(24.dp)
+            Modifier.height(
+                24.dp
+            )
         )
     }
 }
@@ -753,46 +1174,117 @@ fun PantallaHomeUTP(
 
 @Composable
 private fun ItemChecklist(
-    texto: String
+    texto: String,
+    cumplido: Boolean
 ) {
 
-    Row(
+    Card(
         modifier =
-            Modifier.padding(
-                vertical = 5.dp
-            ),
+            Modifier
+                .fillMaxWidth()
+                .padding(
+                    vertical =
+                        4.dp
+                ),
 
-        verticalAlignment =
-            Alignment.CenterVertically
+        colors =
+            CardDefaults
+                .cardColors(
+
+                    containerColor =
+
+                        if (
+                            cumplido
+                        ) {
+
+                            Paleta.VerdeClaro
+
+                        } else {
+
+                            Paleta.AmbarClaro
+                        }
+                ),
+
+        shape =
+            RoundedCornerShape(
+                10.dp
+            )
     ) {
 
-        Icon(
-            imageVector =
-                Icons.Default.CheckCircle,
-
-            contentDescription =
-                null,
-
-            tint =
-                Paleta.Verde
-        )
-
-
-        Spacer(
+        Row(
             modifier =
-                Modifier.width(8.dp)
-        )
+                Modifier.padding(
+                    12.dp
+                ),
+
+            verticalAlignment =
+                Alignment.CenterVertically
+        ) {
+
+            Icon(
+                imageVector =
+
+                    if (
+                        cumplido
+                    ) {
+
+                        Icons.Default
+                            .CheckCircle
+
+                    } else {
+
+                        Icons.Default
+                            .Warning
+                    },
+
+                contentDescription =
+                    null,
+
+                tint =
+
+                    if (
+                        cumplido
+                    ) {
+
+                        Paleta.VerdeOscuro
+
+                    } else {
+
+                        Paleta.AmbarOscuro
+                    }
+            )
 
 
-        Text(
-            text =
-                texto,
+            Spacer(
+                Modifier.width(
+                    8.dp
+                )
+            )
 
-            fontSize =
-                14.sp,
 
-            color =
-                Paleta.Texto
-        )
+            Text(
+                text =
+                    texto,
+
+                fontSize =
+                    13.sp,
+
+                fontWeight =
+                    FontWeight.Medium,
+
+                color =
+
+                    if (
+                        cumplido
+                    ) {
+
+                        Paleta.VerdeOscuro
+
+                    } else {
+
+                        Paleta.AmbarOscuro
+                    }
+            )
+        }
     }
 }
