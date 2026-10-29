@@ -199,87 +199,108 @@ fun PantallaHomeEstudiante(
     ) {
 
         // -------------------------
-        // PERFIL
-        // -------------------------
+// PERFIL
+// -------------------------
 
         Row(
             modifier =
                 Modifier.fillMaxWidth(),
 
             verticalAlignment =
-                Alignment.CenterVertically
+                Alignment.CenterVertically,
+
+            horizontalArrangement =
+                Arrangement.SpaceBetween
         ) {
 
-            Box(
-                modifier =
-                    Modifier
-                        .size(44.dp)
-                        .background(
-                            Color.White,
-                            RoundedCornerShape(
-                                22.dp
-                            )
-                        )
-                        .border(
-                            1.dp,
-                            Color.LightGray,
-                            RoundedCornerShape(
-                                22.dp
-                            )
-                        ),
+            Row(
+                verticalAlignment =
+                    Alignment.CenterVertically,
 
-                contentAlignment =
-                    Alignment.Center
+                modifier =
+                    Modifier.weight(1f)
             ) {
 
-                Text(
-                    text =
-                        "SC",
+                Box(
+                    modifier =
+                        Modifier
+                            .size(44.dp)
+                            .background(
+                                Color.White,
+                                RoundedCornerShape(
+                                    22.dp
+                                )
+                            )
+                            .border(
+                                1.dp,
+                                Color.LightGray,
+                                RoundedCornerShape(
+                                    22.dp
+                                )
+                            ),
 
-                    color =
-                        Paleta.AzulOscuro,
+                    contentAlignment =
+                        Alignment.Center
+                ) {
 
-                    fontWeight =
-                        FontWeight.Bold
+                    Text(
+                        text =
+                            "SC",
+
+                        color =
+                            Paleta.AzulOscuro,
+
+                        fontWeight =
+                            FontWeight.Bold
+                    )
+                }
+
+
+                Spacer(
+                    Modifier.width(
+                        12.dp
+                    )
                 )
+
+
+                Column {
+
+                    Text(
+                        text =
+                            fechaActual,
+
+                        fontSize =
+                            11.sp,
+
+                        color =
+                            Paleta.TextoSuave
+                    )
+
+
+                    Text(
+                        text =
+                            "¡Hola, Sofía!",
+
+                        fontSize =
+                            22.sp,
+
+                        fontWeight =
+                            FontWeight.Bold,
+
+                        color =
+                            Paleta.Texto
+                    )
+                }
             }
 
 
-            Spacer(
-                Modifier.width(
-                    12.dp
-                )
+            BotonCerrarSesion(
+                navController =
+                    navController,
+
+                rutaHome =
+                    "home_estudiante"
             )
-
-
-            Column {
-
-                Text(
-                    text =
-                        fechaActual,
-
-                    fontSize =
-                        11.sp,
-
-                    color =
-                        Paleta.TextoSuave
-                )
-
-
-                Text(
-                    text =
-                        "¡Hola, Sofía!",
-
-                    fontSize =
-                        22.sp,
-
-                    fontWeight =
-                        FontWeight.Bold,
-
-                    color =
-                        Paleta.Texto
-                )
-            }
         }
 
 

@@ -41,54 +41,98 @@ fun PantallaHomeDocente(
 
         // PERFIL DOCENTE
         Row(
+            modifier =
+                Modifier.fillMaxWidth(),
+
             verticalAlignment =
-                Alignment.CenterVertically
+                Alignment.CenterVertically,
+
+            horizontalArrangement =
+                Arrangement.SpaceBetween
         ) {
 
-            Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .background(
-                        Paleta.AmbarClaro,
-                        RoundedCornerShape(22.dp)
-                    ),
+            Row(
+                verticalAlignment =
+                    Alignment.CenterVertically,
 
-                contentAlignment =
-                    Alignment.Center
+                modifier =
+                    Modifier.weight(1f)
             ) {
 
-                Text(
-                    text = "JM",
-                    color =
-                        Paleta.AmbarOscuro,
-                    fontWeight =
-                        FontWeight.Bold
+                Box(
+                    modifier =
+                        Modifier
+                            .size(44.dp)
+                            .background(
+                                Paleta.AmbarClaro,
+                                RoundedCornerShape(
+                                    22.dp
+                                )
+                            ),
+
+                    contentAlignment =
+                        Alignment.Center
+                ) {
+
+                    Text(
+                        text =
+                            "JM",
+
+                        color =
+                            Paleta.AmbarOscuro,
+
+                        fontWeight =
+                            FontWeight.Bold
+                    )
+                }
+
+
+                Spacer(
+                    modifier =
+                        Modifier.width(
+                            12.dp
+                        )
                 )
+
+
+                Column {
+
+                    Text(
+                        text =
+                            "Vista docente",
+
+                        fontSize =
+                            11.sp,
+
+                        color =
+                            Paleta.TextoSuave
+                    )
+
+
+                    Text(
+                        text =
+                            "Hola, Javier",
+
+                        fontSize =
+                            22.sp,
+
+                        fontWeight =
+                            FontWeight.Bold,
+
+                        color =
+                            Paleta.Texto
+                    )
+                }
             }
 
 
-            Spacer(
-                modifier = Modifier.width(12.dp)
+            BotonCerrarSesion(
+                navController =
+                    navController,
+
+                rutaHome =
+                    "home_docente"
             )
-
-
-            Column {
-
-                Text(
-                    text = "Vista docente",
-                    fontSize = 11.sp,
-                    color =
-                        Paleta.TextoSuave
-                )
-
-                Text(
-                    text = "Hola, Javier",
-                    fontSize = 22.sp,
-                    fontWeight =
-                        FontWeight.Bold,
-                    color = Paleta.Texto
-                )
-            }
         }
 
 

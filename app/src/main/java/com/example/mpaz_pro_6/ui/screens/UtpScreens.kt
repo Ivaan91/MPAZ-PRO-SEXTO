@@ -84,31 +84,65 @@ fun PantallaHomeUTP(
         // ENCABEZADO
         // -------------------------
 
-        Text(
-            text =
-                "Revisión UTP",
+        Row(
+            modifier =
+                Modifier.fillMaxWidth(),
 
-            fontWeight =
-                FontWeight.Bold,
+            verticalAlignment =
+                Alignment.Top,
 
-            fontSize =
-                22.sp,
+            horizontalArrangement =
+                Arrangement.SpaceBetween
+        ) {
 
-            color =
-                Paleta.Texto
-        )
+            Column(
+                modifier =
+                    Modifier.weight(1f)
+            ) {
+
+                Text(
+                    text =
+                        "Revisión UTP",
+
+                    fontWeight =
+                        FontWeight.Bold,
+
+                    fontSize =
+                        22.sp,
+
+                    color =
+                        Paleta.Texto
+                )
 
 
-        Text(
-            text =
-                "Revisa y autoriza las unidades enviadas por el equipo docente.",
+                Text(
+                    text =
+                        "Revisa y autoriza las unidades enviadas por el equipo docente.",
 
-            fontSize =
-                12.sp,
+                    fontSize =
+                        12.sp,
 
-            color =
-                Paleta.TextoSuave
-        )
+                    color =
+                        Paleta.TextoSuave
+                )
+            }
+
+
+            Spacer(
+                Modifier.width(
+                    8.dp
+                )
+            )
+
+
+            BotonCerrarSesion(
+                navController =
+                    navController,
+
+                rutaHome =
+                    "home_utp"
+            )
+        }
 
 
         Spacer(
