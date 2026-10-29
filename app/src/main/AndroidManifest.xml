@@ -6,8 +6,16 @@
 
 
     <!--
-        Permite que Android encuentre los motores
-        de Text To Speech instalados en el dispositivo.
+        Android 13 o superior necesita
+        permiso para mostrar notificaciones.
+    -->
+    <uses-permission
+        android:name="android.permission.POST_NOTIFICATIONS" />
+
+
+    <!--
+        Permite encontrar motores
+        de Text To Speech instalados.
     -->
     <queries>
 
