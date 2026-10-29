@@ -5,6 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -25,7 +29,6 @@ class MainActivity : ComponentActivity() {
     ) {
 
         super.onCreate(savedInstanceState)
-
 
         val db =
             AppDatabase.getDatabase(this)
@@ -74,7 +77,91 @@ fun AppNavigation(
 
     NavHost(
         navController = navController,
-        startDestination = "login"
+        startDestination = "login",
+
+        // ANIMACIÓN AL AVANZAR HACIA OTRA PANTALLA
+        enterTransition = {
+
+            fadeIn(
+                animationSpec = tween(
+                    durationMillis = 250
+                )
+            ) +
+
+                    slideIntoContainer(
+                        towards =
+                            AnimatedContentTransitionScope
+                                .SlideDirection.Start,
+
+                        animationSpec = tween(
+                            durationMillis = 300
+                        )
+                    )
+        },
+
+
+        // ANIMACIÓN DE LA PANTALLA QUE SALE
+        exitTransition = {
+
+            fadeOut(
+                animationSpec = tween(
+                    durationMillis = 200
+                )
+            ) +
+
+                    slideOutOfContainer(
+                        towards =
+                            AnimatedContentTransitionScope
+                                .SlideDirection.Start,
+
+                        animationSpec = tween(
+                            durationMillis = 300
+                        )
+                    )
+        },
+
+
+        // ANIMACIÓN CUANDO VOLVEMOS ATRÁS
+        popEnterTransition = {
+
+            fadeIn(
+                animationSpec = tween(
+                    durationMillis = 250
+                )
+            ) +
+
+                    slideIntoContainer(
+                        towards =
+                            AnimatedContentTransitionScope
+                                .SlideDirection.End,
+
+                        animationSpec = tween(
+                            durationMillis = 300
+                        )
+                    )
+        },
+
+
+        // LA PANTALLA ACTUAL SALE HACIA EL OTRO LADO
+        popExitTransition = {
+
+            fadeOut(
+                animationSpec = tween(
+                    durationMillis = 200
+                )
+            ) +
+
+                    slideOutOfContainer(
+                        towards =
+                            AnimatedContentTransitionScope
+                                .SlideDirection.End,
+
+                        animationSpec = tween(
+                            durationMillis = 300
+                        )
+                    )
+        }
+
     ) {
 
         // LOGIN
@@ -89,7 +176,10 @@ fun AppNavigation(
         }
 
 
+        // -------------------------
         // ESTUDIANTE
+        // -------------------------
+
         composable(
             route = "home_estudiante"
         ) {
@@ -268,7 +358,10 @@ fun AppNavigation(
         }
 
 
+        // -------------------------
         // DOCENTE
+        // -------------------------
+
         composable(
             route = "home_docente"
         ) {
@@ -299,7 +392,10 @@ fun AppNavigation(
         }
 
 
+        // -------------------------
         // UTP
+        // -------------------------
+
         composable(
             route = "home_utp"
         ) {
