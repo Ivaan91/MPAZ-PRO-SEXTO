@@ -37,218 +37,357 @@ fun PantallaLogin(
     usuarioDao: UsuarioDao
 ) {
 
-    val loginViewModel: LoginViewModel = viewModel(
-        factory = LoginViewModelFactory(usuarioDao)
-    )
+    val loginViewModel: LoginViewModel =
+        viewModel(
+            factory =
+                LoginViewModelFactory(
+                    usuarioDao
+                )
+        )
 
-    val uiState by loginViewModel.uiState.collectAsState()
+
+    val uiState by
+    loginViewModel
+        .uiState
+        .collectAsState()
+
 
     var usuarios by remember {
-        mutableStateOf<List<UsuarioEntity>>(emptyList())
+        mutableStateOf<
+                List<UsuarioEntity>
+                >(emptyList())
     }
+
 
     var claveVisible by remember {
         mutableStateOf(false)
     }
+
 
     var mostrarCuentas by remember {
         mutableStateOf(false)
     }
 
 
+    // -------------------------
+    // USUARIOS DE DEMOSTRACIÓN
+    // -------------------------
+
     LaunchedEffect(Unit) {
 
-        var lista = usuarioDao.obtenerTodosLosUsuarios()
+        var lista =
+            usuarioDao
+                .obtenerTodosLosUsuarios()
 
+
+        /*
+         * Solo se insertan si la base
+         * de datos todavía está vacía.
+         */
         if (lista.isEmpty()) {
 
             usuarioDao.insertarUsuarios(
+
                 listOf(
+
                     UsuarioEntity(
                         iniciales = "SC",
-                        nombre = "Sofía Contreras",
-                        descripcion = "Estudiante · 6.º A",
-                        rol = "Estudiante",
-                        usuario = "sofia",
-                        clave = "sofia123"
+                        nombre =
+                            "Sofía Contreras",
+                        descripcion =
+                            "Estudiante · 6.º A",
+                        rol =
+                            "Estudiante",
+                        usuario =
+                            "sofia",
+                        clave =
+                            "sofia123"
                     ),
+
 
                     UsuarioEntity(
                         iniciales = "JM",
-                        nombre = "Javier Muñoz",
-                        descripcion = "Profesor jefe · 6.º A",
-                        rol = "Docente",
-                        usuario = "javier",
-                        clave = "javier123"
+                        nombre =
+                            "Javier Muñoz",
+                        descripcion =
+                            "Profesor jefe · 6.º A",
+                        rol =
+                            "Docente",
+                        usuario =
+                            "javier",
+                        clave =
+                            "javier123"
                     ),
+
 
                     UsuarioEntity(
                         iniciales = "AV",
-                        nombre = "Andrea Vidal",
-                        descripcion = "Unidad Técnico Pedagógica",
-                        rol = "UTP",
-                        usuario = "andrea",
-                        clave = "andrea123"
+                        nombre =
+                            "Andrea Vidal",
+                        descripcion =
+                            "Unidad Técnico Pedagógica",
+                        rol =
+                            "UTP",
+                        usuario =
+                            "andrea",
+                        clave =
+                            "andrea123"
                     )
                 )
             )
 
-            lista = usuarioDao.obtenerTodosLosUsuarios()
+
+            lista =
+                usuarioDao
+                    .obtenerTodosLosUsuarios()
         }
 
-        usuarios = lista
+
+        usuarios =
+            lista
     }
 
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF8F9FA))
+            .background(
+                Color(0xFFF8F9FA)
+            )
             .imePadding()
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(
+                rememberScrollState()
+            )
     ) {
 
-        // Encabezado azul.
+        // -------------------------
+        // ENCABEZADO
+        // -------------------------
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(210.dp)
                 .background(
-                    color = Color(0xFF1E3A8A),
-                    shape = RoundedCornerShape(
-                        bottomStart = 24.dp,
-                        bottomEnd = 24.dp
-                    )
+                    color =
+                        Color(0xFF1E3A8A),
+
+                    shape =
+                        RoundedCornerShape(
+                            bottomStart =
+                                24.dp,
+                            bottomEnd =
+                                24.dp
+                        )
                 )
                 .padding(24.dp)
         ) {
 
             Column(
-                modifier = Modifier.align(Alignment.CenterStart)
+                modifier =
+                    Modifier.align(
+                        Alignment.CenterStart
+                    )
             ) {
 
                 Icon(
-                    imageVector = Icons.Default.MenuBook,
-                    contentDescription = "Logo",
-                    tint = Color.White,
-                    modifier = Modifier.size(44.dp)
+                    imageVector =
+                        Icons.Default.MenuBook,
+
+                    contentDescription =
+                        "Logo",
+
+                    tint =
+                        Color.White,
+
+                    modifier =
+                        Modifier.size(44.dp)
                 )
+
 
                 Spacer(
-                    modifier = Modifier.height(12.dp)
+                    modifier =
+                        Modifier.height(12.dp)
                 )
 
-                Text(
-                    text = "MPAZ PRO 6.º",
-                    color = Color.White,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
-                )
 
                 Text(
-                    text = "Escuela Escritora Marcela Paz - Apoyo didáctico",
-                    color = Color.White,
-                    fontSize = 13.sp
+                    text =
+                        "MPAZ PRO 6.º",
+
+                    color =
+                        Color.White,
+
+                    fontSize =
+                        28.sp,
+
+                    fontWeight =
+                        FontWeight.Bold
+                )
+
+
+                Text(
+                    text =
+                        "Escuela Escritora Marcela Paz - Apoyo didáctico",
+
+                    color =
+                        Color.White,
+
+                    fontSize =
+                        13.sp
                 )
             }
         }
 
 
         Spacer(
-            modifier = Modifier.height(24.dp)
+            modifier =
+                Modifier.height(24.dp)
         )
 
 
         Column(
-            modifier = Modifier.padding(horizontal = 24.dp)
+            modifier =
+                Modifier.padding(
+                    horizontal = 24.dp
+                )
         ) {
 
             Text(
-                text = "Iniciar sesión",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
+                text =
+                    "Iniciar sesión",
+
+                fontSize =
+                    20.sp,
+
+                fontWeight =
+                    FontWeight.Bold,
+
+                color =
+                    Color.Black
             )
 
+
             Text(
-                text = "Ingresa tu usuario y tu clave.",
-                fontSize = 13.sp,
-                color = Color.Gray
+                text =
+                    "Ingresa tu usuario y tu clave.",
+
+                fontSize =
+                    13.sp,
+
+                color =
+                    Color.Gray
             )
 
 
             Spacer(
-                modifier = Modifier.height(16.dp)
+                modifier =
+                    Modifier.height(16.dp)
             )
 
 
-            // CAMPO USUARIO
+            // -------------------------
+            // USUARIO
+            // -------------------------
+
             OutlinedTextField(
-                value = uiState.usuario,
+                value =
+                    uiState.usuario,
 
                 onValueChange = {
-                    loginViewModel.cambiarUsuario(it)
+
+                    loginViewModel
+                        .cambiarUsuario(it)
                 },
 
                 label = {
                     Text("Usuario")
                 },
 
-                singleLine = true,
+                singleLine =
+                    true,
 
-                // Si existe un error de usuario,
-                // Material 3 muestra el campo en estado de error.
-                isError = uiState.errorUsuario != null,
+                isError =
+                    uiState.errorUsuario !=
+                            null,
 
                 trailingIcon = {
 
-                    if (uiState.errorUsuario != null) {
+                    if (
+                        uiState.errorUsuario !=
+                        null
+                    ) {
 
                         Icon(
-                            imageVector = Icons.Default.Error,
-                            contentDescription = "Error en usuario",
-                            tint = MaterialTheme.colorScheme.error
+                            imageVector =
+                                Icons.Default.Error,
+
+                            contentDescription =
+                                "Error en usuario",
+
+                            tint =
+                                MaterialTheme
+                                    .colorScheme
+                                    .error
                         )
                     }
                 },
 
                 supportingText = {
 
-                    uiState.errorUsuario?.let { mensaje ->
+                    uiState.errorUsuario
+                        ?.let { mensaje ->
 
-                        Text(
-                            text = mensaje,
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
+                            Text(
+                                text =
+                                    mensaje,
+
+                                color =
+                                    MaterialTheme
+                                        .colorScheme
+                                        .error
+                            )
+                        }
                 },
 
-                modifier = Modifier.fillMaxWidth()
+                modifier =
+                    Modifier.fillMaxWidth()
             )
 
 
             Spacer(
-                modifier = Modifier.height(8.dp)
+                modifier =
+                    Modifier.height(8.dp)
             )
 
 
-            // CAMPO CLAVE
+            // -------------------------
+            // CLAVE
+            // -------------------------
+
             OutlinedTextField(
-                value = uiState.clave,
+                value =
+                    uiState.clave,
 
                 onValueChange = {
-                    loginViewModel.cambiarClave(it)
+
+                    loginViewModel
+                        .cambiarClave(it)
                 },
 
                 label = {
                     Text("Clave")
                 },
 
-                singleLine = true,
+                singleLine =
+                    true,
 
-                isError = uiState.errorClave != null,
+                isError =
+                    uiState.errorClave !=
+                            null,
 
                 visualTransformation =
+
                     if (claveVisible) {
 
                         VisualTransformation.None
@@ -261,40 +400,59 @@ fun PantallaLogin(
                 trailingIcon = {
 
                     Row(
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment =
+                            Alignment.CenterVertically
                     ) {
 
-                        // Ícono de error.
-                        if (uiState.errorClave != null) {
+                        if (
+                            uiState.errorClave !=
+                            null
+                        ) {
 
                             Icon(
-                                imageVector = Icons.Default.Error,
-                                contentDescription = "Error en clave",
-                                tint = MaterialTheme.colorScheme.error
+                                imageVector =
+                                    Icons.Default.Error,
+
+                                contentDescription =
+                                    "Error en clave",
+
+                                tint =
+                                    MaterialTheme
+                                        .colorScheme
+                                        .error
                             )
                         }
 
 
-                        // Mostrar / ocultar contraseña.
                         IconButton(
                             onClick = {
-                                claveVisible = !claveVisible
+
+                                claveVisible =
+                                    !claveVisible
                             }
                         ) {
 
                             Icon(
                                 imageVector =
-                                    if (claveVisible) {
 
-                                        Icons.Default.VisibilityOff
+                                    if (
+                                        claveVisible
+                                    ) {
+
+                                        Icons.Default
+                                            .VisibilityOff
 
                                     } else {
 
-                                        Icons.Default.Visibility
+                                        Icons.Default
+                                            .Visibility
                                     },
 
                                 contentDescription =
-                                    if (claveVisible) {
+
+                                    if (
+                                        claveVisible
+                                    ) {
 
                                         "Ocultar clave"
 
@@ -309,200 +467,320 @@ fun PantallaLogin(
 
                 supportingText = {
 
-                    uiState.errorClave?.let { mensaje ->
+                    uiState.errorClave
+                        ?.let { mensaje ->
 
-                        Text(
-                            text = mensaje,
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
+                            Text(
+                                text =
+                                    mensaje,
+
+                                color =
+                                    MaterialTheme
+                                        .colorScheme
+                                        .error
+                            )
+                        }
                 },
 
-                modifier = Modifier.fillMaxWidth()
+                modifier =
+                    Modifier.fillMaxWidth()
             )
 
 
-            // ERROR GENERAL:
-            // usuario y contraseña escritos,
-            // pero las credenciales no son correctas.
-            uiState.errorGeneral?.let { mensaje ->
+            // -------------------------
+            // ERROR GENERAL
+            // -------------------------
 
-                Spacer(
-                    modifier = Modifier.height(8.dp)
-                )
+            uiState.errorGeneral
+                ?.let { mensaje ->
 
-                Text(
-                    text = mensaje,
-                    color = MaterialTheme.colorScheme.error,
-                    fontSize = 13.sp
-                )
-            }
+                    Spacer(
+                        modifier =
+                            Modifier.height(8.dp)
+                    )
+
+
+                    Text(
+                        text =
+                            mensaje,
+
+                        color =
+                            MaterialTheme
+                                .colorScheme
+                                .error,
+
+                        fontSize =
+                            13.sp
+                    )
+                }
 
 
             Spacer(
-                modifier = Modifier.height(20.dp)
+                modifier =
+                    Modifier.height(20.dp)
             )
 
 
-            // BOTÓN INGRESAR
+            // -------------------------
+            // INGRESAR
+            // -------------------------
+
             Button(
                 onClick = {
 
-                    loginViewModel.iniciarSesion { rol ->
+                    loginViewModel
+                        .iniciarSesion { rol ->
 
-                        when (rol) {
+                            val destino =
 
-                            "Estudiante" -> {
+                                when (rol) {
+
+                                    "Estudiante" ->
+                                        "home_estudiante"
+
+                                    "Docente" ->
+                                        "home_docente"
+
+                                    "UTP" ->
+                                        "home_utp"
+
+                                    else ->
+                                        null
+                                }
+
+
+                            if (
+                                destino != null
+                            ) {
+
+                                /*
+                                 * Eliminamos el login
+                                 * del historial.
+                                 *
+                                 * De esta manera, después
+                                 * de iniciar sesión, el botón
+                                 * Atrás no vuelve al login.
+                                 */
                                 navController.navigate(
-                                    "home_estudiante"
-                                )
-                            }
+                                    destino
+                                ) {
 
-                            "Docente" -> {
-                                navController.navigate(
-                                    "home_docente"
-                                )
-                            }
+                                    popUpTo(
+                                        "login"
+                                    ) {
 
-                            "UTP" -> {
-                                navController.navigate(
-                                    "home_utp"
-                                )
+                                        inclusive =
+                                            true
+                                    }
+
+                                    launchSingleTop =
+                                        true
+                                }
                             }
                         }
-                    }
                 },
 
-                // Lo dejamos habilitado aunque los campos
-                // estén vacíos para poder mostrar los errores.
-                enabled = !uiState.cargando,
+                enabled =
+                    !uiState.cargando,
 
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
 
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF2563EB)
-                ),
+                colors =
+                    ButtonDefaults
+                        .buttonColors(
+                            containerColor =
+                                Color(
+                                    0xFF2563EB
+                                )
+                        ),
 
-                shape = RoundedCornerShape(12.dp)
+                shape =
+                    RoundedCornerShape(
+                        12.dp
+                    )
             ) {
 
-                if (uiState.cargando) {
+                if (
+                    uiState.cargando
+                ) {
 
                     CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = Color.White,
-                        strokeWidth = 2.dp
+                        modifier =
+                            Modifier.size(
+                                24.dp
+                            ),
+
+                        color =
+                            Color.White,
+
+                        strokeWidth =
+                            2.dp
                     )
 
                 } else {
 
-                    Text("Ingresar")
+                    Text(
+                        text =
+                            "Ingresar"
+                    )
                 }
             }
 
 
             Spacer(
-                modifier = Modifier.height(12.dp)
+                modifier =
+                    Modifier.height(12.dp)
             )
 
 
-            // BOTÓN CUENTAS DE DEMOSTRACIÓN
+            // -------------------------
+            // CUENTAS DE DEMOSTRACIÓN
+            // -------------------------
+
             TextButton(
                 onClick = {
-                    mostrarCuentas = !mostrarCuentas
+
+                    mostrarCuentas =
+                        !mostrarCuentas
                 }
             ) {
 
                 Text(
-                    text = "Cuentas de demostración",
-                    color = Color(0xFF2563EB)
+                    text =
+                        "Cuentas de demostración",
+
+                    color =
+                        Color(0xFF2563EB)
                 )
+
 
                 Icon(
                     imageVector =
-                        if (mostrarCuentas) {
 
-                            Icons.Default.KeyboardArrowUp
+                        if (
+                            mostrarCuentas
+                        ) {
+
+                            Icons.Default
+                                .KeyboardArrowUp
 
                         } else {
 
-                            Icons.Default.KeyboardArrowDown
+                            Icons.Default
+                                .KeyboardArrowDown
                         },
 
-                    contentDescription = null,
-                    tint = Color(0xFF2563EB)
+                    contentDescription =
+                        null,
+
+                    tint =
+                        Color(0xFF2563EB)
                 )
             }
 
 
-            // LISTA DE CUENTAS
             if (mostrarCuentas) {
 
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier =
+                        Modifier.fillMaxWidth(),
 
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    ),
+                    colors =
+                        CardDefaults
+                            .cardColors(
+                                containerColor =
+                                    Color.White
+                            ),
 
-                    shape = RoundedCornerShape(12.dp)
+                    shape =
+                        RoundedCornerShape(
+                            12.dp
+                        )
                 ) {
 
                     Column(
-                        modifier = Modifier.padding(
-                            vertical = 8.dp
-                        )
+                        modifier =
+                            Modifier.padding(
+                                vertical = 8.dp
+                            )
                     ) {
 
                         Text(
-                            text = "Toca una cuenta para completar los campos.",
-                            fontSize = 12.sp,
-                            color = Color.Gray,
-                            modifier = Modifier.padding(
-                                horizontal = 16.dp,
-                                vertical = 4.dp
-                            )
+                            text =
+                                "Toca una cuenta para completar los campos.",
+
+                            fontSize =
+                                12.sp,
+
+                            color =
+                                Color.Gray,
+
+                            modifier =
+                                Modifier.padding(
+                                    horizontal =
+                                        16.dp,
+                                    vertical =
+                                        4.dp
+                                )
                         )
 
 
-                        usuarios.forEach { user ->
+                        usuarios.forEach {
+                                user ->
 
                             Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
 
-                                        // Los valores ahora se modifican
-                                        // mediante el ViewModel.
-                                        loginViewModel.cambiarUsuario(
-                                            user.usuario
+                                            loginViewModel
+                                                .cambiarUsuario(
+                                                    user.usuario
+                                                )
+
+                                            loginViewModel
+                                                .cambiarClave(
+                                                    user.clave
+                                                )
+
+                                            claveVisible =
+                                                false
+                                        }
+                                        .padding(
+                                            horizontal =
+                                                16.dp,
+                                            vertical =
+                                                8.dp
                                         )
-
-                                        loginViewModel.cambiarClave(
-                                            user.clave
-                                        )
-
-                                        claveVisible = false
-                                    }
-                                    .padding(
-                                        horizontal = 16.dp,
-                                        vertical = 8.dp
-                                    )
                             ) {
 
                                 Text(
-                                    text = "${user.rol} · ${user.nombre}",
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Black,
-                                    fontSize = 14.sp
+                                    text =
+                                        "${user.rol} · ${user.nombre}",
+
+                                    fontWeight =
+                                        FontWeight.Bold,
+
+                                    color =
+                                        Color.Black,
+
+                                    fontSize =
+                                        14.sp
                                 )
 
+
                                 Text(
-                                    text = "${user.usuario} / ${user.clave}",
-                                    fontSize = 12.sp,
-                                    color = Color.Gray
+                                    text =
+                                        "${user.usuario} / ${user.clave}",
+
+                                    fontSize =
+                                        12.sp,
+
+                                    color =
+                                        Color.Gray
                                 )
                             }
                         }
@@ -512,20 +790,37 @@ fun PantallaLogin(
 
 
             Spacer(
-                modifier = Modifier.height(8.dp)
+                modifier =
+                    Modifier.height(8.dp)
             )
 
 
+            /*
+             * Antes decía:
+             *
+             * "Sin permisos del dispositivo"
+             *
+             * Eso ya no es correcto porque
+             * utilizamos notificaciones Android.
+             */
             Text(
-                text = "Demostración con datos ficticios · Sin permisos del dispositivo",
-                fontSize = 11.sp,
-                color = Color.Gray,
-                modifier = Modifier.fillMaxWidth()
+                text =
+                    "Demostración con datos ficticios · Recursos del dispositivo bajo autorización",
+
+                fontSize =
+                    11.sp,
+
+                color =
+                    Color.Gray,
+
+                modifier =
+                    Modifier.fillMaxWidth()
             )
 
 
             Spacer(
-                modifier = Modifier.height(24.dp)
+                modifier =
+                    Modifier.height(24.dp)
             )
         }
     }
