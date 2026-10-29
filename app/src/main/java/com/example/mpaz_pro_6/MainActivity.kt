@@ -18,6 +18,8 @@ import androidx.navigation.navArgument
 import com.example.mpaz_pro_6.data.AppDatabase
 import com.example.mpaz_pro_6.data.UsuarioDao
 import com.example.mpaz_pro_6.model.Etapa
+import com.example.mpaz_pro_6.model.GestionAcademicaRepository
+import com.example.mpaz_pro_6.model.ProgresoRepository
 import com.example.mpaz_pro_6.ui.screens.*
 import com.example.mpaz_pro_6.ui.theme.MPAZPRO6Theme
 
@@ -28,30 +30,76 @@ class MainActivity : ComponentActivity() {
         savedInstanceState: Bundle?
     ) {
 
-        super.onCreate(savedInstanceState)
+        super.onCreate(
+            savedInstanceState
+        )
+
+
+        // -------------------------
+        // BASE DE DATOS ROOM
+        // -------------------------
 
         val db =
-            AppDatabase.getDatabase(this)
+            AppDatabase
+                .getDatabase(this)
+
 
         val usuarioDao =
             db.usuarioDao()
 
 
+        // -------------------------
+        // PERSISTENCIA LOCAL
+        // -------------------------
+
+        /*
+         * Cargamos el progreso,
+         * intentos y configuración
+         * docente guardados.
+         */
+        ProgresoRepository
+            .inicializar(this)
+
+
+        /*
+         * Cargamos autorizaciones
+         * UTP y estados de informes.
+         */
+        GestionAcademicaRepository
+            .inicializar(this)
+
+
+        // -------------------------
+        // BARRAS DEL SISTEMA
+        // -------------------------
+
         enableEdgeToEdge(
 
             statusBarStyle =
                 SystemBarStyle.light(
-                    android.graphics.Color.TRANSPARENT,
-                    android.graphics.Color.TRANSPARENT
+
+                    android.graphics
+                        .Color.TRANSPARENT,
+
+                    android.graphics
+                        .Color.TRANSPARENT
                 ),
 
             navigationBarStyle =
                 SystemBarStyle.light(
-                    android.graphics.Color.TRANSPARENT,
-                    android.graphics.Color.TRANSPARENT
+
+                    android.graphics
+                        .Color.TRANSPARENT,
+
+                    android.graphics
+                        .Color.TRANSPARENT
                 )
         )
 
+
+        // -------------------------
+        // INTERFAZ
+        // -------------------------
 
         setContent {
 
@@ -76,97 +124,135 @@ fun AppNavigation(
 
 
     NavHost(
-        navController = navController,
-        startDestination = "login",
 
-        // ANIMACIÓN AL AVANZAR HACIA OTRA PANTALLA
+        navController =
+            navController,
+
+        startDestination =
+            "login",
+
+
+        // -------------------------
+        // AVANZAR
+        // -------------------------
+
         enterTransition = {
 
             fadeIn(
-                animationSpec = tween(
-                    durationMillis = 250
-                )
+                animationSpec =
+                    tween(
+                        durationMillis =
+                            250
+                    )
             ) +
 
                     slideIntoContainer(
+
                         towards =
                             AnimatedContentTransitionScope
-                                .SlideDirection.Start,
+                                .SlideDirection
+                                .Start,
 
-                        animationSpec = tween(
-                            durationMillis = 300
-                        )
+                        animationSpec =
+                            tween(
+                                durationMillis =
+                                    300
+                            )
                     )
         },
 
 
-        // ANIMACIÓN DE LA PANTALLA QUE SALE
         exitTransition = {
 
             fadeOut(
-                animationSpec = tween(
-                    durationMillis = 200
-                )
+                animationSpec =
+                    tween(
+                        durationMillis =
+                            200
+                    )
             ) +
 
                     slideOutOfContainer(
+
                         towards =
                             AnimatedContentTransitionScope
-                                .SlideDirection.Start,
+                                .SlideDirection
+                                .Start,
 
-                        animationSpec = tween(
-                            durationMillis = 300
-                        )
+                        animationSpec =
+                            tween(
+                                durationMillis =
+                                    300
+                            )
                     )
         },
 
 
-        // ANIMACIÓN CUANDO VOLVEMOS ATRÁS
+        // -------------------------
+        // VOLVER
+        // -------------------------
+
         popEnterTransition = {
 
             fadeIn(
-                animationSpec = tween(
-                    durationMillis = 250
-                )
+                animationSpec =
+                    tween(
+                        durationMillis =
+                            250
+                    )
             ) +
 
                     slideIntoContainer(
+
                         towards =
                             AnimatedContentTransitionScope
-                                .SlideDirection.End,
+                                .SlideDirection
+                                .End,
 
-                        animationSpec = tween(
-                            durationMillis = 300
-                        )
+                        animationSpec =
+                            tween(
+                                durationMillis =
+                                    300
+                            )
                     )
         },
 
 
-        // LA PANTALLA ACTUAL SALE HACIA EL OTRO LADO
         popExitTransition = {
 
             fadeOut(
-                animationSpec = tween(
-                    durationMillis = 200
-                )
+                animationSpec =
+                    tween(
+                        durationMillis =
+                            200
+                    )
             ) +
 
                     slideOutOfContainer(
+
                         towards =
                             AnimatedContentTransitionScope
-                                .SlideDirection.End,
+                                .SlideDirection
+                                .End,
 
-                        animationSpec = tween(
-                            durationMillis = 300
-                        )
+                        animationSpec =
+                            tween(
+                                durationMillis =
+                                    300
+                            )
                     )
         }
 
     ) {
 
+
+        // =========================
         // LOGIN
+        // =========================
+
         composable(
-            route = "login"
+            route =
+                "login"
         ) {
 
             PantallaLogin(
@@ -176,12 +262,13 @@ fun AppNavigation(
         }
 
 
-        // -------------------------
+        // =========================
         // ESTUDIANTE
-        // -------------------------
+        // =========================
 
         composable(
-            route = "home_estudiante"
+            route =
+                "home_estudiante"
         ) {
 
             PantallaHomeEstudiante(
@@ -191,6 +278,7 @@ fun AppNavigation(
 
 
         composable(
+
             route =
                 "detalle_unidad/{asignaturaId}",
 
@@ -205,7 +293,9 @@ fun AppNavigation(
                             NavType.StringType
                     }
                 )
+
         ) { entrada ->
+
 
             PantallaDetalleUnidad(
 
@@ -221,6 +311,7 @@ fun AppNavigation(
 
 
         composable(
+
             route =
                 "contenido/{asignaturaId}/{indice}",
 
@@ -235,6 +326,7 @@ fun AppNavigation(
                             NavType.StringType
                     },
 
+
                     navArgument(
                         "indice"
                     ) {
@@ -243,7 +335,9 @@ fun AppNavigation(
                             NavType.IntType
                     }
                 )
+
         ) { entrada ->
+
 
             PantallaContenido(
 
@@ -265,6 +359,7 @@ fun AppNavigation(
 
 
         composable(
+
             route =
                 "quiz/{asignaturaId}/{etapa}",
 
@@ -279,6 +374,7 @@ fun AppNavigation(
                             NavType.StringType
                     },
 
+
                     navArgument(
                         "etapa"
                     ) {
@@ -287,7 +383,9 @@ fun AppNavigation(
                             NavType.StringType
                     }
                 )
+
         ) { entrada ->
+
 
             PantallaQuiz(
 
@@ -312,6 +410,7 @@ fun AppNavigation(
 
 
         composable(
+
             route =
                 "resultado/{asignaturaId}/{etapa}",
 
@@ -326,6 +425,7 @@ fun AppNavigation(
                             NavType.StringType
                     },
 
+
                     navArgument(
                         "etapa"
                     ) {
@@ -334,7 +434,9 @@ fun AppNavigation(
                             NavType.StringType
                     }
                 )
+
         ) { entrada ->
+
 
             PantallaResultadoPrueba(
 
@@ -358,12 +460,13 @@ fun AppNavigation(
         }
 
 
-        // -------------------------
+        // =========================
         // DOCENTE
-        // -------------------------
+        // =========================
 
         composable(
-            route = "home_docente"
+            route =
+                "home_docente"
         ) {
 
             PantallaHomeDocente(
@@ -373,7 +476,8 @@ fun AppNavigation(
 
 
         composable(
-            route = "configuracion_unidad"
+            route =
+                "configuracion_unidad"
         ) {
 
             PantallaConfiguracionUnidad(
@@ -383,7 +487,8 @@ fun AppNavigation(
 
 
         composable(
-            route = "informe_pedagogico"
+            route =
+                "informe_pedagogico"
         ) {
 
             PantallaInformePedagogico(
@@ -392,12 +497,13 @@ fun AppNavigation(
         }
 
 
-        // -------------------------
+        // =========================
         // UTP
-        // -------------------------
+        // =========================
 
         composable(
-            route = "home_utp"
+            route =
+                "home_utp"
         ) {
 
             PantallaHomeUTP(
