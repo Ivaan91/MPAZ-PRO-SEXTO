@@ -19,6 +19,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.mpaz_pro_6.model.InformesResumen
+import com.example.mpaz_pro_6.model.MockRepository
+import com.example.mpaz_pro_6.model.ProgresoRepository
 import com.example.mpaz_pro_6.ui.theme.Paleta
 
 
@@ -162,14 +165,13 @@ fun PantallaHomeDocente(
             ) {
 
                 Text(
-                    text =
-                        "Avance promedio del curso",
+                    text = "Avance del estudiante de demostración",
                     color = Color.White,
                     fontSize = 13.sp
                 )
 
                 Text(
-                    text = "67%",
+                    text = "${(ProgresoRepository.avanceGeneral() * 100).toInt()}%",
                     color = Color.White,
                     fontSize = 34.sp,
                     fontWeight =
@@ -192,19 +194,19 @@ fun PantallaHomeDocente(
                 ) {
 
                     Text(
-                        text = "24 activos",
+                        text = "${MockRepository.asignaturas.size} unidades",
                         color = Color.White,
                         fontSize = 12.sp
                     )
 
                     Text(
-                        text = "18 al día",
+                        text = "${InformesResumen.validados()} validados",
                         color = Color.White,
                         fontSize = 12.sp
                     )
 
                     Text(
-                        text = "4 pendientes",
+                        text = "${InformesResumen.pendientes()} por validar",
                         color = Color.White,
                         fontSize = 12.sp
                     )
@@ -338,9 +340,7 @@ fun PantallaHomeDocente(
                 .fillMaxWidth()
                 .clickable {
 
-                    navController.navigate(
-                        "informe_pedagogico"
-                    )
+                    navController.navigate("lista_informes")
                 },
 
             colors =
@@ -398,8 +398,11 @@ fun PantallaHomeDocente(
                 ) {
 
                     Text(
-                        text =
-                            "3 informes pendientes de validar",
+                        text = when (InformesResumen.pendientes()) {
+                            0 -> "No hay informes pendientes"
+                            1 -> "1 informe pendiente de validar"
+                            else -> "${InformesResumen.pendientes()} informes pendientes de validar"
+                        },
                         fontWeight =
                             FontWeight.Bold,
                         color =

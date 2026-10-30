@@ -487,13 +487,20 @@ fun AppNavigation(
 
 
         composable(
-            route =
-                "informe_pedagogico"
+            route = "lista_informes"
         ) {
+            PantallaListaInformes(navController)
+        }
 
-            PantallaInformePedagogico(
-                navController
+        composable(
+            route = "informe_pedagogico/{asignaturaId}",
+            arguments = listOf(
+                navArgument("asignaturaId") {
+                    type = NavType.StringType
+                }
             )
+        ) {
+            PantallaInformePedagogico(navController)
         }
 
 

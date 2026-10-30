@@ -23,6 +23,7 @@ import androidx.navigation.NavHostController
 import com.example.mpaz_pro_6.model.EstadoInformePedagogico
 import com.example.mpaz_pro_6.model.MockRepository
 import com.example.mpaz_pro_6.ui.theme.Paleta
+import com.example.mpaz_pro_6.viewmodel.InformePedagogicoUiState
 import com.example.mpaz_pro_6.viewmodel.InformePedagogicoViewModel
 
 
@@ -203,6 +204,8 @@ fun PantallaInformePedagogico(
                 color =
                     Paleta.TextoSuave
             )
+            Spacer(modifier = Modifier.height(12.dp))
+            FichaInforme(uiState)
 
 
             Spacer(
@@ -448,7 +451,7 @@ fun PantallaInformePedagogico(
 
             Text(
                 text =
-                    "Rendimiento por objetivo",
+                    "Rendimiento por etapa",
 
                 fontWeight =
                     FontWeight.Bold,
@@ -890,6 +893,8 @@ fun PantallaInformePedagogico(
             }
 
 
+            Spacer(modifier = Modifier.height(12.dp))
+            BotonDescargarInforme(uiState, asignatura, unidad)
             Spacer(
                 modifier =
                     Modifier.height(24.dp)
@@ -984,5 +989,34 @@ private fun RendimientoItem(
             trackColor =
                 Paleta.Borde
         )
+    }
+}
+
+@Composable
+private fun FichaInforme(uiState: InformePedagogicoUiState) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            FilaFicha("Estudiante", "${uiState.estudiante} · ${uiState.curso}")
+            FilaFicha("Docente responsable", uiState.docenteResponsable)
+            FilaFicha("Fecha de generación", uiState.fechaGeneracion)
+            FilaFicha("Respuestas correctas", "${uiState.respuestasCorrectas}")
+            FilaFicha("Respuestas incorrectas", "${uiState.respuestasIncorrectas}")
+        }
+    }
+}
+
+@Composable
+private fun FilaFicha(nombre: String, valor: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(nombre, fontSize = 13.sp, color = Paleta.TextoSuave)
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(valor, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Paleta.Texto)
     }
 }
